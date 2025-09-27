@@ -1,0 +1,13 @@
+/*
+  Localizable.strings
+  Momentic
+
+  Created by Yaraslau Merynau on 25.09.25.
+  
+*/
+
+"welcome_title_text" = "Welcome";
+"welcome_subtitle_text" = "Drive into varieties of joyful stories with Momentic. Each moment is unique.";
+"signup_button_text" = "Sign up";
+"signin_label_text" = "Already have an account?";
+"signin_button_text" = "Sign in";
