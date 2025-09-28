@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "welcomeBackground.svg",
+      "filename" : "welcomeBackground.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "welcomeBackground 1.svg",
+      "filename" : "welcomeBackground_2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "welcomeBackground 2.svg",
+      "filename" : "welcomeBackground_3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
