@@ -271,10 +271,20 @@ private extension WelcomeViewController {
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.tintColor = .white
         signUpButton.clipsToBounds = true
+        signUpButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
         signInButton.setTitle(NSLocalizedString("signin_label_text", comment: "Sign in"), for: .normal)
         signInButton.titleLabel?.font = .systemFont(ofSize: Constants.signInButtonTextSize, weight: .medium)
         signInButton.backgroundColor = .clear
         signInButton.tintColor = UIColor(named: "lightGreen")
+        signInButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+}
+
+//MARK: - Selectors
+
+private extension WelcomeViewController {
+    @objc func buttonTapped() {
+        navigationController?.pushViewController(AuthViewController(), animated: true)
     }
 }

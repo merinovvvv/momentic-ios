@@ -11,3 +11,8 @@
 "signup_button_text" = "Sign up";
 "signin_label_text" = "Already have an account?";
 "signin_button_text" = "Sign in";
+
+"email_label_text" = "University e-mail";
+"email_textfield_placeholder" = "Mail given you by the uni";
+"password_label_text" = "Password";
+"password_textfield_placeholder" = "Input your password here";

@@ -11,3 +11,8 @@
 "signup_button_text" = "Зарегистрироваться";
 "signin_label_text" = "Уже есть аккаунт?";
 "signin_button_text" = "Войти";
+
+"email_label_text" = "Электронная почта университета";
+"email_textfield_placeholder" = "Почта, выданная вам университетом";
+"password_label_text" = "Пароль";
+"password_textfield_placeholder" = "Введите свой пароль здесь";

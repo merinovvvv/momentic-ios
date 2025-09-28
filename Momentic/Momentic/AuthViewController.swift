@@ -1,0 +1,196 @@
+//
+//  AuthViewController.swift
+//  Momentic
+//
+//  Created by Yaraslau Merynau on 29.09.25.
+//
+
+import UIKit
+
+final class AuthViewController: UIViewController {
+    
+    //MARK: - Properties
+    
+    var authMode: AuthMode = .signUp
+    
+    //MARK: - Constants
+    
+    private enum Constants {
+        
+        //MARK: - Constraints
+        
+        static let appIconImageViewTopSpacing: CGFloat = 175
+        static let appIconImageViewWidth: CGFloat = 60
+        static let appIconImageViewHeight: CGFloat = 90
+        
+        static let authLabelTopSpacing: CGFloat = 36
+        
+        static let authStackTopSpacing: CGFloat = 32
+        static let authStackHorizontalSpacing: CGFloat = 16
+        
+        static let authTextFieldHeight: CGFloat = 52
+        
+        static let authButtonTopSpacing: CGFloat = 40
+        static let authButtonHorizontalSpacing: CGFloat = 16
+        static let authButtonHeight: CGFloat = 52
+        
+        //MARK: - Values
+        
+        static let authLabelTextSize: CGFloat = 44
+        
+        static let authInfoLabelTextSize: CGFloat = 20
+        
+        static let authTextFieldCornerRadius: CGFloat = 16
+        static let authTextFieldPlaceholderTextSize: CGFloat = 16
+        
+        static let innerStackSpacing: CGFloat = 10
+        static let authStackSpacing: CGFloat = 16
+        
+        static let authButtonCornerRadius: CGFloat = 16
+        static let authButtonTextSize: CGFloat = 16
+        
+        static let authTextFieldPadding: CGFloat = 20
+        
+    }
+    
+    //MARK: - UI Properties
+    
+    private let appIconImageView: UIImageView = UIImageView()
+    
+    private let authLabel: UILabel = UILabel()
+    
+    private let authStack: UIStackView = UIStackView()
+    
+    private let emailStack: UIStackView = UIStackView()
+    private let emailLabel: UILabel = UILabel()
+    private let emailTextField: UITextField = UITextField()
+    
+    private let passwordStack: UIStackView = UIStackView()
+    private let passwordLabel: UILabel = UILabel()
+    private let passwordTextField: UITextField = UITextField()
+    
+    private let authButton: UIButton = UIButton(type: .system)
+    
+    //MARK: - LifeCycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        setupUI()
+    }
+}
+
+//MARK: - Setup UI
+private extension AuthViewController {
+    func setupUI() {
+        setupViewHierarchy()
+        setupConstraints()
+        configureViews()
+    }
+    
+    func setupViewHierarchy() {
+        view.addSubview(appIconImageView)
+        view.addSubview(authLabel)
+        view.addSubview(authStack)
+        
+        authStack.addArrangedSubview(emailStack)
+        
+        emailStack.addArrangedSubview(emailLabel)
+        emailStack.addArrangedSubview(emailTextField)
+        
+        authStack.addArrangedSubview(passwordStack)
+        
+        passwordStack.addArrangedSubview(passwordLabel)
+        passwordStack.addArrangedSubview(passwordTextField)
+        
+        view.addSubview(authButton)
+    }
+    
+    func setupConstraints() {
+        [appIconImageView, authLabel, authStack, emailStack, emailLabel, emailTextField, passwordStack, passwordLabel, passwordTextField, authButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        NSLayoutConstraint.activate([
+            appIconImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.appIconImageViewTopSpacing),
+            appIconImageView.widthAnchor.constraint(equalToConstant: Constants.appIconImageViewWidth),
+            appIconImageView.heightAnchor.constraint(equalToConstant: Constants.appIconImageViewHeight),
+            appIconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            authLabel.topAnchor.constraint(equalTo: appIconImageView.bottomAnchor, constant: Constants.authLabelTopSpacing),
+            authLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            authStack.topAnchor.constraint(equalTo: authLabel.bottomAnchor, constant: Constants.authStackTopSpacing),
+            authStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.authStackHorizontalSpacing),
+            authStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.authStackHorizontalSpacing),
+            
+            emailTextField.heightAnchor.constraint(equalToConstant: Constants.authTextFieldHeight),
+            passwordTextField.heightAnchor.constraint(equalToConstant: Constants.authTextFieldHeight),
+            
+            authButton.topAnchor.constraint(equalTo: authStack.bottomAnchor, constant: Constants.authButtonTopSpacing),
+            authButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.authButtonHorizontalSpacing),
+            authButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.authButtonHorizontalSpacing),
+            authButton.heightAnchor.constraint(equalToConstant: Constants.authButtonHeight)
+        ])
+    }
+    
+    func configureViews() {
+        appIconImageView.image = UIImage(named: "appIcon")
+        
+        switch authMode {
+        case .signUp:
+            authLabel.text = NSLocalizedString("signup_button_text", comment: "SignUp")
+            authButton.setTitle(NSLocalizedString("signup_button_text", comment: "SignUp"), for: .normal)
+        case .signIn:
+            authLabel.text = NSLocalizedString("signin_button_text", comment: "SignIn")
+            authButton.setTitle(NSLocalizedString("signin_button_text", comment: "SignIn"), for: .normal)
+        }
+        
+        authLabel.textColor = UIColor(named: "main")
+        authLabel.font = UIFont.systemFont(ofSize: Constants.authLabelTextSize, weight: .medium)
+        
+        authStack.axis = .vertical
+        authStack.spacing = Constants.authStackSpacing
+        authStack.distribution = .fill
+        authStack.alignment = .fill
+        
+        [emailStack, passwordStack].forEach {
+            $0.axis = .vertical
+            $0.spacing = Constants.innerStackSpacing
+            $0.distribution = .fill
+            $0.alignment = .fill
+        }
+        
+        emailLabel.text = NSLocalizedString("email_label_text", comment: "emailLabel")
+        passwordLabel.text = NSLocalizedString("password_label_text", comment: "passwordLabel")
+        
+        [emailLabel, passwordLabel].forEach {
+            $0.font = UIFont.systemFont(ofSize: Constants.authInfoLabelTextSize, weight: .regular)
+            $0.textColor = UIColor(named: "main")
+            $0.textAlignment = .left
+        }
+        
+        emailTextField.placeholder = NSLocalizedString("email_textfield_placeholder", comment: "emailTextFieldPlaceholder")
+        passwordTextField.placeholder = NSLocalizedString("password_textfield_placeholder", comment: "passwordTextFieldPlaceholder")
+        
+        [emailTextField, passwordTextField].forEach {
+            $0.backgroundColor = UIColor(named: "backgroundGray")
+            $0.textColor = UIColor(named: "subtitle")
+            $0.font = UIFont.systemFont(ofSize: Constants.authTextFieldPlaceholderTextSize, weight: .light)
+            $0.layer.cornerRadius = Constants.authTextFieldCornerRadius
+            $0.textAlignment = .left
+            
+            let leftPaddingView = UIView(frame: CGRect(x: .zero, y: .zero, width: Constants.authTextFieldPadding, height: .zero))
+            let rightPaddingView = UIView(frame: CGRect(x: .zero, y: .zero, width: Constants.authTextFieldPadding, height: .zero))
+            
+            $0.leftView = leftPaddingView
+            $0.leftViewMode = .always
+            $0.rightView = rightPaddingView
+            $0.rightViewMode = .always
+        }
+        
+        authButton.backgroundColor = UIColor(named: "main")
+        authButton.tintColor = .white
+        authButton.layer.cornerRadius = Constants.authButtonCornerRadius
+    }
+}
