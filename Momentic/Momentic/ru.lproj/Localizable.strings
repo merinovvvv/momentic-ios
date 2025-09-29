@@ -16,3 +16,5 @@
 "email_textfield_placeholder" = "Почта, выданная вам университетом";
 "password_label_text" = "Пароль";
 "password_textfield_placeholder" = "Введите свой пароль здесь";
+"email_error_text" = "Электронная почта должна быть написана в формате: surname.faculty@bsu.by";
+"password_error_text" = "Пароль должен содержать строчные и прописные буквы, а также цифры";

@@ -34,6 +34,8 @@ final class AuthViewController: UIViewController {
         static let authButtonHorizontalSpacing: CGFloat = 16
         static let authButtonHeight: CGFloat = 52
         
+        static let errorLabelTopSpacing: CGFloat = 4
+        
         //MARK: - Values
         
         static let authLabelTextSize: CGFloat = 44
@@ -50,6 +52,9 @@ final class AuthViewController: UIViewController {
         static let authButtonTextSize: CGFloat = 16
         
         static let authTextFieldPadding: CGFloat = 20
+        static let authTextFieldBorderWidth: CGFloat = 2
+        
+        static let errorLabelTextSize: CGFloat = 12
         
     }
     
@@ -70,6 +75,9 @@ final class AuthViewController: UIViewController {
     private let passwordTextField: UITextField = UITextField()
     
     private let authButton: UIButton = UIButton(type: .system)
+    
+    private let wrongEmailLabel: UILabel = UILabel()
+    private let wrongPasswordLabel: UILabel = UILabel()
     
     //MARK: - LifeCycle
     
@@ -97,17 +105,19 @@ private extension AuthViewController {
         
         emailStack.addArrangedSubview(emailLabel)
         emailStack.addArrangedSubview(emailTextField)
+        emailStack.addArrangedSubview(wrongEmailLabel)
         
         authStack.addArrangedSubview(passwordStack)
         
         passwordStack.addArrangedSubview(passwordLabel)
         passwordStack.addArrangedSubview(passwordTextField)
+        passwordStack.addArrangedSubview(wrongPasswordLabel)
         
         view.addSubview(authButton)
     }
     
     func setupConstraints() {
-        [appIconImageView, authLabel, authStack, emailStack, emailLabel, emailTextField, passwordStack, passwordLabel, passwordTextField, authButton].forEach {
+        [appIconImageView, authLabel, authStack, emailStack, emailLabel, emailTextField, passwordStack, passwordLabel, passwordTextField, authButton, wrongEmailLabel, wrongPasswordLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -161,6 +171,9 @@ private extension AuthViewController {
             $0.alignment = .fill
         }
         
+        emailStack.setCustomSpacing(Constants.errorLabelTopSpacing, after: emailTextField)
+        passwordStack.setCustomSpacing(Constants.errorLabelTopSpacing, after: passwordTextField)
+        
         emailLabel.text = NSLocalizedString("email_label_text", comment: "emailLabel")
         passwordLabel.text = NSLocalizedString("password_label_text", comment: "passwordLabel")
         
@@ -187,10 +200,77 @@ private extension AuthViewController {
             $0.leftViewMode = .always
             $0.rightView = rightPaddingView
             $0.rightViewMode = .always
+            
+            $0.delegate = self
         }
         
         authButton.backgroundColor = UIColor(named: "main")
         authButton.tintColor = .white
         authButton.layer.cornerRadius = Constants.authButtonCornerRadius
+        authButton.addTarget(self, action: #selector(authButtonTapped), for: .touchUpInside)
+        
+        [wrongEmailLabel, wrongPasswordLabel].forEach {
+            $0.isHidden = true
+            $0.textColor = UIColor(named: "wrongInput")
+            $0.font = UIFont.systemFont(ofSize: Constants.errorLabelTextSize, weight: .light)
+        }
+        
+        wrongEmailLabel.text = NSLocalizedString("email_error_text", comment: "Wrong email format")
+        wrongPasswordLabel.text = NSLocalizedString("password_error_text", comment: "Wrong password format")
+    }
+}
+
+//MARK: - UITextFieldDelegate
+
+extension AuthViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+        [wrongEmailLabel, wrongPasswordLabel].forEach { $0.isHidden = true }
+        
+        textField.backgroundColor = .white
+        textField.layer.borderColor = UIColor(named: "subtitle")?.cgColor
+        textField.layer.borderWidth = Constants.authTextFieldBorderWidth
+        textField.textColor = UIColor(named: "activeText")
+        
+        textField.attributedPlaceholder = NSAttributedString(
+            string: textField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "activeText") ?? .black]
+        )
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        textField.backgroundColor = UIColor(named: "backgroundGray")
+        textField.layer.borderColor = .none
+        textField.layer.borderWidth = .zero
+        textField.textColor = UIColor(named: "subtitle")
+        
+        textField.attributedPlaceholder = NSAttributedString(
+            string: textField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "subtitle") ?? .black]
+        )
+    }
+}
+
+//MARK: - Selectors
+
+private extension AuthViewController {
+    @objc func authButtonTapped() {
+        //TODO: - add logic
+        
+        [emailTextField, passwordTextField].forEach {
+            
+            $0.resignFirstResponder()
+            
+            $0.text = ""
+            
+            $0.layer.borderWidth = Constants.authTextFieldBorderWidth
+            $0.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+            $0.attributedPlaceholder = NSAttributedString(
+                string: $0.placeholder ?? "",
+                attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+            )
+        }
+        
+        [wrongEmailLabel, wrongPasswordLabel].forEach { $0.isHidden = false }
     }
 }
