@@ -38,23 +38,23 @@ final class AuthViewController: UIViewController {
         
         //MARK: - Values
         
-        static let authLabelTextSize: CGFloat = 44
+        static let authLabelFontSize: CGFloat = 44
         
-        static let authInfoLabelTextSize: CGFloat = 20
+        static let authInfoLabelFontSize: CGFloat = 20
         
         static let authTextFieldCornerRadius: CGFloat = 16
-        static let authTextFieldPlaceholderTextSize: CGFloat = 16
+        static let authTextFieldPlaceholderFontSize: CGFloat = 16
         
         static let innerStackSpacing: CGFloat = 10
         static let authStackSpacing: CGFloat = 16
         
         static let authButtonCornerRadius: CGFloat = 16
-        static let authButtonTextSize: CGFloat = 16
+        static let authButtonFontSize: CGFloat = 16
         
         static let authTextFieldPadding: CGFloat = 20
         static let authTextFieldBorderWidth: CGFloat = 2
         
-        static let errorLabelTextSize: CGFloat = 12
+        static let errorLabelFontSize: CGFloat = 12
         
     }
     
@@ -157,7 +157,7 @@ private extension AuthViewController {
         }
         
         authLabel.textColor = UIColor(named: "main")
-        authLabel.font = UIFont.systemFont(ofSize: Constants.authLabelTextSize, weight: .medium)
+        authLabel.font = UIFont.systemFont(ofSize: Constants.authLabelFontSize, weight: .medium)
         
         authStack.axis = .vertical
         authStack.spacing = Constants.authStackSpacing
@@ -178,7 +178,7 @@ private extension AuthViewController {
         passwordLabel.text = NSLocalizedString("password_label_text", comment: "passwordLabel")
         
         [emailLabel, passwordLabel].forEach {
-            $0.font = UIFont.systemFont(ofSize: Constants.authInfoLabelTextSize, weight: .regular)
+            $0.font = UIFont.systemFont(ofSize: Constants.authInfoLabelFontSize, weight: .regular)
             $0.textColor = UIColor(named: "main")
             $0.textAlignment = .left
         }
@@ -189,7 +189,7 @@ private extension AuthViewController {
         [emailTextField, passwordTextField].forEach {
             $0.backgroundColor = UIColor(named: "backgroundGray")
             $0.textColor = UIColor(named: "subtitle")
-            $0.font = UIFont.systemFont(ofSize: Constants.authTextFieldPlaceholderTextSize, weight: .light)
+            $0.font = UIFont.systemFont(ofSize: Constants.authTextFieldPlaceholderFontSize, weight: .light)
             $0.layer.cornerRadius = Constants.authTextFieldCornerRadius
             $0.textAlignment = .left
             
@@ -212,7 +212,7 @@ private extension AuthViewController {
         [wrongEmailLabel, wrongPasswordLabel].forEach {
             $0.isHidden = true
             $0.textColor = UIColor(named: "wrongInput")
-            $0.font = UIFont.systemFont(ofSize: Constants.errorLabelTextSize, weight: .light)
+            $0.font = UIFont.systemFont(ofSize: Constants.errorLabelFontSize, weight: .light)
         }
         
         wrongEmailLabel.text = NSLocalizedString("email_error_text", comment: "Wrong email format")
@@ -230,11 +230,11 @@ extension AuthViewController: UITextFieldDelegate {
         textField.backgroundColor = .white
         textField.layer.borderColor = UIColor(named: "subtitle")?.cgColor
         textField.layer.borderWidth = Constants.authTextFieldBorderWidth
-        textField.textColor = UIColor(named: "activeText")
+        textField.textColor = UIColor(named: "main")
         
         textField.attributedPlaceholder = NSAttributedString(
             string: textField.placeholder ?? "",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "activeText") ?? .black]
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "main") ?? .black]
         )
     }
     

@@ -9,8 +9,6 @@ import UIKit
 
 final class WelcomeViewController: UIViewController {
     
-    //MARK: - Properties
-    
     //MARK: - Constants
     
     private enum Constants {
@@ -53,14 +51,14 @@ final class WelcomeViewController: UIViewController {
         
         static let rightImageViewRotateAngle: CGFloat = -10 * .pi / 180
         
-        static let welcomeTitleLabelTextSize: CGFloat = 44
+        static let welcomeTitleLabelFontSize: CGFloat = 44
         
-        static let welcomeSubtitleLabelTextSize: CGFloat = 16
+        static let welcomeSubtitleLabelFontSize: CGFloat = 16
         
-        static let signUpButtonTextSize: CGFloat = 16
+        static let signUpButtonFontSize: CGFloat = 16
         static let signUpButtonCornerRadius: CGFloat = 16
         
-        static let signInButtonTextSize: CGFloat = 12
+        static let signInButtonFontSize: CGFloat = 12
         
         static let signStackSpacing: CGFloat = 8
         
@@ -251,12 +249,12 @@ private extension WelcomeViewController {
         rightImageView.contentMode = .scaleAspectFill
         
         welcomeTitleLabel.text = NSLocalizedString("welcome_title_text", comment: "Welcome message")
-        welcomeTitleLabel.font = .systemFont(ofSize: Constants.welcomeTitleLabelTextSize, weight: .medium)
+        welcomeTitleLabel.font = .systemFont(ofSize: Constants.welcomeTitleLabelFontSize, weight: .medium)
         welcomeTitleLabel.textColor = .main
         welcomeTitleLabel.textAlignment = .center
         
         welcomeSubtitleLabel.text = NSLocalizedString("welcome_subtitle_text", comment: "Welcome Momentic text")
-        welcomeSubtitleLabel.font = .systemFont(ofSize: Constants.welcomeSubtitleLabelTextSize, weight: .light)
+        welcomeSubtitleLabel.font = .systemFont(ofSize: Constants.welcomeSubtitleLabelFontSize, weight: .light)
         welcomeSubtitleLabel.textColor = UIColor(named: "subtitle")
         welcomeSubtitleLabel.textAlignment = .center
         welcomeSubtitleLabel.numberOfLines = .zero
@@ -266,7 +264,7 @@ private extension WelcomeViewController {
         signStack.spacing = Constants.signStackSpacing
         
         signUpButton.setTitle(NSLocalizedString("signup_button_text", comment: "Sign up"), for: .normal)
-        signUpButton.titleLabel?.font = .systemFont(ofSize: Constants.signUpButtonTextSize, weight: .medium)
+        signUpButton.titleLabel?.font = .systemFont(ofSize: Constants.signUpButtonFontSize, weight: .medium)
         signUpButton.backgroundColor = UIColor(named: "main")
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.tintColor = .white
@@ -274,7 +272,7 @@ private extension WelcomeViewController {
         signUpButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
         signInButton.setTitle(NSLocalizedString("signin_label_text", comment: "Sign in"), for: .normal)
-        signInButton.titleLabel?.font = .systemFont(ofSize: Constants.signInButtonTextSize, weight: .medium)
+        signInButton.titleLabel?.font = .systemFont(ofSize: Constants.signInButtonFontSize, weight: .medium)
         signInButton.backgroundColor = .clear
         signInButton.tintColor = UIColor(named: "lightGreen")
         signInButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)

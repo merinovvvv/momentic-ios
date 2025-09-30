@@ -18,3 +18,7 @@
 "password_textfield_placeholder" = "Input your password here";
 "email_error_text" = "Mail should be written in format: surname.faculty@bsu.by";
 "password_error_text" = "Password should include lower and upper case plus numbers";
+
+"enter_code_text" = "Enter code";
+"enter_code_explanation_text" = "5-digit verification code has been sent to your mail";
+"send_again_button_text" = "Send again";
