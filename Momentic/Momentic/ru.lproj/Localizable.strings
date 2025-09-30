@@ -22,3 +22,11 @@
 "enter_code_text" = "Введите код";
 "enter_code_explanation_text" = "5-значный код подтверждения отправлен вам на электронную почту";
 "send_again_button_text" = "Отправить снова";
+
+"profile_info_label" = "Информация профиля";
+"name_label" = "Имя";
+"name_textfield_placeholder" = "Иван";
+"surname_label" = "Фамилия";
+"surname_textfield_placeholder" = "Иванов";
+"bio_label" = "О себе";
+"bio_textview_placeholder" = "прим. студент БГУ ФПМИ";

@@ -36,6 +36,8 @@ final class AuthViewController: UIViewController {
         
         static let errorLabelTopSpacing: CGFloat = 4
         
+        static let authInfoLabelInnerHorizontalSpacing: CGFloat = 8
+        
         //MARK: - Values
         
         static let authLabelFontSize: CGFloat = 44
@@ -103,13 +105,15 @@ private extension AuthViewController {
         
         authStack.addArrangedSubview(emailStack)
         
-        emailStack.addArrangedSubview(emailLabel)
+        let emailLabelContainer = createLabelContainer(for: emailLabel)
+        emailStack.addArrangedSubview(emailLabelContainer)
         emailStack.addArrangedSubview(emailTextField)
         emailStack.addArrangedSubview(wrongEmailLabel)
         
         authStack.addArrangedSubview(passwordStack)
         
-        passwordStack.addArrangedSubview(passwordLabel)
+        let passwordLabelContainer = createLabelContainer(for: passwordLabel)
+        passwordStack.addArrangedSubview(passwordLabelContainer)
         passwordStack.addArrangedSubview(passwordTextField)
         passwordStack.addArrangedSubview(wrongPasswordLabel)
         
@@ -140,7 +144,7 @@ private extension AuthViewController {
             authButton.topAnchor.constraint(equalTo: authStack.bottomAnchor, constant: Constants.authButtonTopSpacing),
             authButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.authButtonHorizontalSpacing),
             authButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.authButtonHorizontalSpacing),
-            authButton.heightAnchor.constraint(equalToConstant: Constants.authButtonHeight)
+            authButton.heightAnchor.constraint(equalToConstant: Constants.authButtonHeight),
         ])
     }
     
@@ -272,5 +276,23 @@ private extension AuthViewController {
         }
         
         [wrongEmailLabel, wrongPasswordLabel].forEach { $0.isHidden = false }
+    }
+}
+
+private extension AuthViewController {
+    func createLabelContainer(for label: UILabel) -> UIView {
+        let container = UIView()
+        container.addSubview(label)
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: container.topAnchor),
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Constants.authInfoLabelInnerHorizontalSpacing),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        
+        return container
     }
 }

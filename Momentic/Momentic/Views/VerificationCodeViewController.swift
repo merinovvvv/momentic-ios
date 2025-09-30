@@ -113,6 +113,3 @@ private extension VerificationCodeViewController {
         sendAgainButton.contentHorizontalAlignment = .leading
     }
 }
-
-//MARK: - Selectors
-

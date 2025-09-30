@@ -61,8 +61,6 @@ final class WelcomeViewController: UIViewController {
         static let signInButtonFontSize: CGFloat = 12
         
         static let signStackSpacing: CGFloat = 8
-        
-        
     }
     
     //MARK: - UI Properties

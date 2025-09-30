@@ -22,3 +22,12 @@
 "enter_code_text" = "Enter code";
 "enter_code_explanation_text" = "5-digit verification code has been sent to your mail";
 "send_again_button_text" = "Send again";
+
+"profile_info_label" = "Profile info";
+"name_label" = "Name";
+"name_textfield_placeholder" = "John";
+"surname_label" = "Surname";
+"surname_textfield_placeholder" = "Johnson";
+"bio_label" = "Bio";
+"bio_textview_placeholder" = "ex. FAMCS BSU Informatics student";
+
