@@ -30,6 +30,7 @@ final class VerificationCodeViewController: UIViewController {
         static let sendAgainButtonTopSpacing: CGFloat = 16
         static let sendAgainButtonLeadingSpacing: CGFloat = 20
         static let sendAgainButtonTrailingSpacing: CGFloat = 16
+        static let sendAgainButtonBottomSpacing: CGFloat = 20
         
         //MARK: - Values
         
@@ -39,9 +40,14 @@ final class VerificationCodeViewController: UIViewController {
         
         static let sendAgainButtonFontSize: CGFloat = 16
         
+        static let animationDuration: TimeInterval = 0.3
+        static let contentOffsetWhenKeyboardShown: CGFloat = 300
     }
     
     //MARK: - UI Properties
+    
+    private let scrollView: UIScrollView = UIScrollView()
+    private let contentView: UIView = UIView()
     
     private let enterCodeLabel: UILabel = UILabel()
     
@@ -57,6 +63,12 @@ final class VerificationCodeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupUI()
+        setupKeyboardObservers()
+        setupTapGesture()
+    }
+    
+    deinit {
+        removeKeyboardObservers()
     }
 }
 
@@ -69,33 +81,51 @@ private extension VerificationCodeViewController {
     }
     
     func setupViewHierarchy() {
-        [enterCodeLabel, explanationLabel, codeInputView, sendAgainButton].forEach { view.addSubview($0) }
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        [enterCodeLabel, explanationLabel, codeInputView, sendAgainButton].forEach { contentView.addSubview($0) }
     }
     
     func setupConstraints() {
-        [enterCodeLabel, explanationLabel, codeInputView, sendAgainButton].forEach { $0.translatesAutoresizingMaskIntoConstraints = false
+        [scrollView, contentView, enterCodeLabel, explanationLabel, codeInputView, sendAgainButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
         NSLayoutConstraint.activate([
-            enterCodeLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.enterCodeLabelTopSpacing),
-            enterCodeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.enterCodeLabelHorizontalSpacing),
-            enterCodeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.enterCodeLabelHorizontalSpacing),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            enterCodeLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.enterCodeLabelTopSpacing),
+            enterCodeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.enterCodeLabelHorizontalSpacing),
+            enterCodeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.enterCodeLabelHorizontalSpacing),
             
             explanationLabel.topAnchor.constraint(equalTo: enterCodeLabel.bottomAnchor, constant: Constants.explanationLabelTopSpacing),
-            explanationLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.explanationLabelLeadingSpacing),
-            explanationLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.explanationLabelTrailingSpacing),
+            explanationLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.explanationLabelLeadingSpacing),
+            explanationLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.explanationLabelTrailingSpacing),
             
             codeInputView.topAnchor.constraint(equalTo: explanationLabel.bottomAnchor, constant: Constants.codeInputViewTopSpacing),
-            codeInputView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.codeInputViewHorizontalSpacing),
-            codeInputView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.codeInputViewHorizontalSpacing),
+            codeInputView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.codeInputViewHorizontalSpacing),
+            codeInputView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.codeInputViewHorizontalSpacing),
             
             sendAgainButton.topAnchor.constraint(equalTo: codeInputView.bottomAnchor, constant: Constants.sendAgainButtonTopSpacing),
-            sendAgainButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sendAgainButtonLeadingSpacing),
-            sendAgainButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sendAgainButtonTrailingSpacing),
+            sendAgainButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.sendAgainButtonLeadingSpacing),
+            sendAgainButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.sendAgainButtonTrailingSpacing),
+            sendAgainButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.sendAgainButtonBottomSpacing),
         ])
     }
     
     func configureViews() {
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.showsVerticalScrollIndicator = false
+        
         enterCodeLabel.text = NSLocalizedString("enter_code_text", comment: "Enter code")
         enterCodeLabel.textColor = UIColor(named: "main")
         enterCodeLabel.textAlignment = .left
@@ -111,5 +141,69 @@ private extension VerificationCodeViewController {
         sendAgainButton.backgroundColor = .clear
         sendAgainButton.tintColor = UIColor(named: "lightGreen")
         sendAgainButton.contentHorizontalAlignment = .leading
+    }
+    
+    func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+}
+
+//MARK: - Keyboard Handling
+private extension VerificationCodeViewController {
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+              let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {
+            return
+        }
+        
+        let keyboardHeight = keyboardFrame.height
+        let contentInsets = UIEdgeInsets(top: .zero, left: .zero, bottom: keyboardHeight, right: .zero)
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset = contentInsets
+            self.scrollView.scrollIndicatorInsets = contentInsets
+            
+            let codeInputFrame = self.codeInputView.convert(self.codeInputView.bounds, to: self.scrollView)
+            let targetY = codeInputFrame.origin.y - Constants.contentOffsetWhenKeyboardShown
+            self.scrollView.setContentOffset(CGPoint(x: .zero, y: targetY), animated: false)
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {
+            return
+        }
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset = .zero
+            self.scrollView.scrollIndicatorInsets = .zero
+        }
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }

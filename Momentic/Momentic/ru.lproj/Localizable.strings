@@ -30,3 +30,6 @@
 "surname_textfield_placeholder" = "Иванов";
 "bio_label" = "О себе";
 "bio_textview_placeholder" = "прим. студент БГУ ФПМИ";
+
+"add_photo_title" = "Добавить фото";
+"add_photo_subtitle" = "Аккаунты с фотографией профиля с большей вероятностью будут распознаны другими пользователями";

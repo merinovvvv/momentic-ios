@@ -38,6 +38,8 @@ final class AuthViewController: UIViewController {
         
         static let authInfoLabelInnerHorizontalSpacing: CGFloat = 8
         
+        static let authButtonBottomSpacing: CGFloat = 40
+        
         //MARK: - Values
         
         static let authLabelFontSize: CGFloat = 44
@@ -58,9 +60,14 @@ final class AuthViewController: UIViewController {
         
         static let errorLabelFontSize: CGFloat = 12
         
+        static let keyboardBottomPadding: CGFloat = 20
+        
     }
     
     //MARK: - UI Properties
+    
+    private let scrollView: UIScrollView = UIScrollView()
+    private let contentView: UIView = UIView()
     
     private let appIconImageView: UIImageView = UIImageView()
     
@@ -87,6 +94,12 @@ final class AuthViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupUI()
+        setupKeyboardObservers()
+        setupTapGesture()
+    }
+    
+    deinit {
+        removeKeyboardObservers()
     }
 }
 
@@ -99,9 +112,13 @@ private extension AuthViewController {
     }
     
     func setupViewHierarchy() {
-        view.addSubview(appIconImageView)
-        view.addSubview(authLabel)
-        view.addSubview(authStack)
+        
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(appIconImageView)
+        contentView.addSubview(authLabel)
+        contentView.addSubview(authStack)
         
         authStack.addArrangedSubview(emailStack)
         
@@ -117,38 +134,54 @@ private extension AuthViewController {
         passwordStack.addArrangedSubview(passwordTextField)
         passwordStack.addArrangedSubview(wrongPasswordLabel)
         
-        view.addSubview(authButton)
+        contentView.addSubview(authButton)
     }
     
     func setupConstraints() {
-        [appIconImageView, authLabel, authStack, emailStack, emailLabel, emailTextField, passwordStack, passwordLabel, passwordTextField, authButton, wrongEmailLabel, wrongPasswordLabel].forEach {
+        [scrollView, contentView, appIconImageView, authLabel, authStack, emailStack, emailLabel, emailTextField, passwordStack, passwordLabel, passwordTextField, authButton, wrongEmailLabel, wrongPasswordLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
         NSLayoutConstraint.activate([
-            appIconImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.appIconImageViewTopSpacing),
+            
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            appIconImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.appIconImageViewTopSpacing),
             appIconImageView.widthAnchor.constraint(equalToConstant: Constants.appIconImageViewWidth),
             appIconImageView.heightAnchor.constraint(equalToConstant: Constants.appIconImageViewHeight),
-            appIconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            appIconImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             authLabel.topAnchor.constraint(equalTo: appIconImageView.bottomAnchor, constant: Constants.authLabelTopSpacing),
-            authLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            authLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             authStack.topAnchor.constraint(equalTo: authLabel.bottomAnchor, constant: Constants.authStackTopSpacing),
-            authStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.authStackHorizontalSpacing),
-            authStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.authStackHorizontalSpacing),
+            authStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.authStackHorizontalSpacing),
+            authStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.authStackHorizontalSpacing),
             
             emailTextField.heightAnchor.constraint(equalToConstant: Constants.authTextFieldHeight),
             passwordTextField.heightAnchor.constraint(equalToConstant: Constants.authTextFieldHeight),
             
             authButton.topAnchor.constraint(equalTo: authStack.bottomAnchor, constant: Constants.authButtonTopSpacing),
-            authButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.authButtonHorizontalSpacing),
-            authButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.authButtonHorizontalSpacing),
+            authButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.authButtonHorizontalSpacing),
+            authButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.authButtonHorizontalSpacing),
             authButton.heightAnchor.constraint(equalToConstant: Constants.authButtonHeight),
+            authButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.authButtonBottomSpacing),
         ])
     }
     
     func configureViews() {
+        
+        scrollView.keyboardDismissMode = .interactive
+        
         appIconImageView.image = UIImage(named: "appIcon")
         
         switch authMode {
@@ -221,6 +254,73 @@ private extension AuthViewController {
         
         wrongEmailLabel.text = NSLocalizedString("email_error_text", comment: "Wrong email format")
         wrongPasswordLabel.text = NSLocalizedString("password_error_text", comment: "Wrong password format")
+    }
+}
+
+//MARK: - Keyboard Handling
+
+private extension AuthViewController {
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+              let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+              let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt else {
+            return
+        }
+        
+        let keyboardHeight = keyboardFrame.height
+        
+        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve)) {
+            self.scrollView.contentInset.bottom = keyboardHeight + Constants.keyboardBottomPadding
+            self.scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight
+            
+            if let activeTextField = [self.emailTextField, self.passwordTextField].first(where: { $0.isFirstResponder }) {
+                let textFieldFrame = activeTextField.convert(activeTextField.bounds, to: self.scrollView)
+                self.scrollView.scrollRectToVisible(textFieldFrame, animated: false)
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+              let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt else {
+            return
+        }
+        
+        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve)) {
+            self.scrollView.contentInset.bottom = .zero
+            self.scrollView.verticalScrollIndicatorInsets.bottom = .zero
+        }
+    }
+    
+    func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 

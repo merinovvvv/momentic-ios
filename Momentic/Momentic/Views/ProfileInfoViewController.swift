@@ -11,6 +11,8 @@ final class ProfileInfoViewController: UIViewController {
     
     //MARK: - Properties
     
+    private var activeTextField: UIView?
+    
     //MARK: - Constants
     
     private enum Constants {
@@ -31,6 +33,8 @@ final class ProfileInfoViewController: UIViewController {
         
         static let bioTextFieldHeight: CGFloat = 112
         
+        static let signUpButtonBottomSpacing: CGFloat = 20
+        
         //MARK: - Values
         
         static let profileInfoLabelFontSize: CGFloat = 44
@@ -49,9 +53,14 @@ final class ProfileInfoViewController: UIViewController {
         
         static let nameLabelInnerHorizontalSpacing: CGFloat = 8
         
+        static let contentOffsetWhenKeyboardShown: CGFloat = 20
+        
     }
     
     //MARK: - UI Properties
+    
+    private let scrollView: UIScrollView = UIScrollView()
+    private let contentView: UIView = UIView()
     
     private let profileInfoLabel: UILabel = UILabel()
     
@@ -78,6 +87,12 @@ final class ProfileInfoViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupUI()
+        setupKeyboardObservers()
+        setupTapGesture()
+    }
+    
+    deinit {
+        removeKeyboardObservers()
     }
 }
 
@@ -90,7 +105,9 @@ private extension ProfileInfoViewController {
     }
     
     func setupViewHierarchy() {
-        [profileInfoLabel, profileInfoStack, signUpButton].forEach { view.addSubview($0) }
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        [profileInfoLabel, profileInfoStack, signUpButton].forEach { contentView.addSubview($0) }
         
         profileInfoStack.addArrangedSubview(fullNameStack)
         
@@ -113,23 +130,35 @@ private extension ProfileInfoViewController {
     }
     
     func setupConstraints() {
-        [profileInfoLabel, profileInfoStack, signUpButton, nameTextField, surnameTextField, bioTextView].forEach {
+        [scrollView, contentView, profileInfoLabel, profileInfoStack, signUpButton, nameTextField, surnameTextField, bioTextView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
         NSLayoutConstraint.activate([
-            profileInfoLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.profileInfoLabelTopSpacing),
-            profileInfoLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.profileInfoLabelHorizontalSpacing),
-            profileInfoLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.profileInfoLabelHorizontalSpacing),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            profileInfoLabel.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: Constants.profileInfoLabelTopSpacing),
+            profileInfoLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.profileInfoLabelHorizontalSpacing),
+            profileInfoLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.profileInfoLabelHorizontalSpacing),
             
             profileInfoStack.topAnchor.constraint(equalTo: profileInfoLabel.bottomAnchor, constant: Constants.profileInfoStackTopSpacing),
-            profileInfoStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.profileInfoStackHorizontalSpacing),
-            profileInfoStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.profileInfoStackHorizontalSpacing),
+            profileInfoStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.profileInfoStackHorizontalSpacing),
+            profileInfoStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.profileInfoStackHorizontalSpacing),
             
             signUpButton.topAnchor.constraint(equalTo: profileInfoStack.bottomAnchor, constant: Constants.signUpButtonTopSpacing),
-            signUpButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.signUpButtonHorizontalSpacing),
-            signUpButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.signUpButtonHorizontalSpacing),
+            signUpButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.signUpButtonHorizontalSpacing),
+            signUpButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.signUpButtonHorizontalSpacing),
             signUpButton.heightAnchor.constraint(equalToConstant: Constants.signUpButtonHeight),
+            signUpButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.signUpButtonBottomSpacing),
             
             nameTextField.heightAnchor.constraint(equalToConstant: Constants.nameTextFieldHeight),
             surnameTextField.heightAnchor.constraint(equalToConstant: Constants.nameTextFieldHeight),
@@ -139,6 +168,9 @@ private extension ProfileInfoViewController {
     }
     
     func configureViews() {
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.showsVerticalScrollIndicator = false
+        
         profileInfoLabel.text = NSLocalizedString("profile_info_label", comment: "Profile info label")
         profileInfoLabel.textColor = UIColor(named: "main")
         profileInfoLabel.textAlignment = .left
@@ -156,6 +188,8 @@ private extension ProfileInfoViewController {
         
         nameTextField.placeholder = NSLocalizedString("name_textfield_placeholder", comment: "Name placeholder")
         surnameTextField.placeholder = NSLocalizedString("surname_textfield_placeholder", comment: "Surame placeholder")
+        nameTextField.delegate = self
+        surnameTextField.delegate = self
     
         [nameTextField, surnameTextField].forEach {
             $0.textColor = UIColor(named: "main")
@@ -185,6 +219,7 @@ private extension ProfileInfoViewController {
         bioTextView.backgroundColor = UIColor(named: "backgroundGray")
         bioTextView.layer.cornerRadius = Constants.textFieldCornerRadius
         bioTextView.placeholder = NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")
+        bioTextView.delegate = self
         
         [nameStack, surnameStack, bioStack].forEach {
             $0.axis = .vertical
@@ -209,8 +244,83 @@ private extension ProfileInfoViewController {
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.signUpButtonTitleFontSize, weight: .medium)
     }
+    
+    func setupTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
 }
 
+//MARK: - Keyboard Handling
+private extension ProfileInfoViewController {
+    func setupKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+              let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+              let activeField = activeTextField else {
+            return
+        }
+        
+        let keyboardHeight = keyboardFrame.height
+        let contentInsets = UIEdgeInsets(top: .zero, left: .zero, bottom: keyboardHeight, right: .zero)
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset = contentInsets
+            self.scrollView.scrollIndicatorInsets = contentInsets
+            
+            let fieldFrame = activeField.convert(activeField.bounds, to: self.scrollView)
+            let visibleRect = CGRect(
+                x: .zero,
+                y: self.scrollView.contentOffset.y,
+                width: self.scrollView.bounds.width,
+                height: self.scrollView.bounds.height - keyboardHeight
+            )
+            
+            if !visibleRect.contains(CGPoint(x: fieldFrame.origin.x, y: fieldFrame.maxY)) {
+                let targetY = fieldFrame.maxY - visibleRect.height + Constants.contentOffsetWhenKeyboardShown
+                self.scrollView.setContentOffset(CGPoint(x: .zero, y: max(.zero, targetY)), animated: false)
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {
+            return
+        }
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset = .zero
+            self.scrollView.scrollIndicatorInsets = .zero
+        }
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+//MARK: - Helper Methods
 private extension ProfileInfoViewController {
     func createLabelContainer(for label: UILabel) -> UIView {
         let container = UIView()
@@ -226,5 +336,36 @@ private extension ProfileInfoViewController {
         ])
         
         return container
+    }
+}
+
+//MARK: - UITextFieldDelegate
+extension ProfileInfoViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        activeTextField = textField
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        activeTextField = nil
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == nameTextField {
+            surnameTextField.becomeFirstResponder()
+        } else if textField == surnameTextField {
+            bioTextView.becomeFirstResponder()
+        }
+        return true
+    }
+}
+
+//MARK: - UITextViewDelegate
+extension ProfileInfoViewController: UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        activeTextField = textView
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        activeTextField = nil
     }
 }

@@ -31,3 +31,5 @@
 "bio_label" = "Bio";
 "bio_textview_placeholder" = "ex. FAMCS BSU Informatics student";
 
+"add_photo_title" = "Add photo";
+"add_photo_subtitle" = "Accounts with profile photo are more likely to be recognised by other users";
