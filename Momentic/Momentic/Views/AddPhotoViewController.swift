@@ -7,7 +7,11 @@
 
 import UIKit
 
-final class AddPhotoViewController: UIViewController {
+final class AddPhotoViewController: UIViewController, FlowController {
+    
+    //MARK: - FlowController
+    var completionHandler: ((()) -> ())?
+    
     
     //MARK: - Properties
     
@@ -168,14 +172,25 @@ private extension AddPhotoViewController {
         addPhotoButton.tintColor = .white
         addPhotoButton.layer.cornerRadius = Constants.addPhotoButtonCornerRadius
         addPhotoButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.addPhotoButtonTextFontSize, weight: .medium)
+        addPhotoButton.addTarget(self, action: #selector(addPhotoButtonTapped), for: .touchUpInside)
         
         skipThisStepButton.setTitle(NSLocalizedString("skip_this_step_button", comment: "Skip this step"), for: .normal)
         skipThisStepButton.setTitleColor(UIColor(named: "subtitle"), for: .normal)
         skipThisStepButton.backgroundColor = .clear
         skipThisStepButton.tintColor = UIColor(named: "subtitle")
         skipThisStepButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.skipThisStepButtonTextFontSize, weight: .medium)
+        skipThisStepButton.addTarget(self, action: #selector(skipThisStepButtonTapped), for: .touchUpInside)
     }
 }
 
 //MARK: - Selectors
+private extension AddPhotoViewController {
+    @objc func addPhotoButtonTapped() {
+        completionHandler?(())
+    }
+    
+    @objc func skipThisStepButtonTapped() {
+        //TODO: - move to the end of the registration
+    }
+}
 

@@ -7,9 +7,11 @@
 
 import UIKit
 
-protocol Coordinator {
+protocol Coordinator: AnyObject {
     
     var navigationController: UINavigationController { get set }
+    
+    var flowCompletionHandler: (() -> Void)? { get set }
     
     func start()
 }

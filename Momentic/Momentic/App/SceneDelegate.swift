@@ -10,13 +10,21 @@ import UIKit
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    
+    var appCoordinator: AppCoordinator = CoordinatorFactory().createAppCoordinator(navigationController: UINavigationController())
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = AddPhotoViewController()
+        window.rootViewController = appCoordinator.navigationController
         self.window = window
+        
+        appCoordinator.navigationController.setNavigationBarHidden(true, animated: false)
+        
+        appCoordinator.start()
+        
         window.makeKeyAndVisible()
     }
 

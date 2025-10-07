@@ -7,7 +7,10 @@
 
 import UIKit
 
-final class WelcomeViewController: UIViewController {
+final class WelcomeViewController: UIViewController, FlowController {
+    
+    //MARK: - FlowController
+    var completionHandler: ((()) -> ())?
     
     //MARK: - Constants
     
@@ -23,12 +26,12 @@ final class WelcomeViewController: UIViewController {
         static let appIconImageViewWidth: CGFloat = 72
         static let appIconImageViewHeight: CGFloat = 110
         
-        static let leftImageViewTopSpacing: CGFloat = 12
+        static let leftImageViewTopSpacing: CGFloat = 150
         static let leftImageViewLeadingSpacing: CGFloat = 25
         static let leftImageViewWidth: CGFloat = 90
         static let leftImageViewHeight: CGFloat = 144
         
-        static let rightImageViewTopSpacing: CGFloat = 54
+        static let rightImageViewTopSpacing: CGFloat = 194
         static let rightImageViewTrailingSpacing: CGFloat = 25
         static let rightImageViewWidth: CGFloat = 100
         static let rightImageViewHeight: CGFloat = 160
@@ -44,12 +47,6 @@ final class WelcomeViewController: UIViewController {
         
         
         //MARK: - Values
-        
-        static let topImageViewRotateAngle: CGFloat = 10 * .pi / 180
-        
-        static let leftImageViewRotateAngle: CGFloat = 15 * .pi / 180
-        
-        static let rightImageViewRotateAngle: CGFloat = -10 * .pi / 180
         
         static let welcomeTitleLabelFontSize: CGFloat = 44
         
@@ -69,13 +66,10 @@ final class WelcomeViewController: UIViewController {
     
     private let appIconImageView: UIImageView = UIImageView()
     
-    private let topImageContainerView: UIView = UIView()
     private let topImageView: UIImageView = UIImageView()
     
-    private let leftImageContainerView: UIView = UIView()
     private let leftImageView: UIImageView = UIImageView()
     
-    private let rightImageContainerView: UIView = UIView()
     private let rightImageView: UIImageView = UIImageView()
     
     private let welcomeTitleLabel: UILabel = UILabel()
@@ -92,14 +86,6 @@ final class WelcomeViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        topImageView.transform = CGAffineTransformMakeRotation( Constants.topImageViewRotateAngle)
-        leftImageView.transform = CGAffineTransformMakeRotation( Constants.leftImageViewRotateAngle)
-        rightImageView.transform = CGAffineTransformMakeRotation( Constants.rightImageViewRotateAngle)
-    }
 }
 
 //MARK: - Setup UI
@@ -111,16 +97,13 @@ private extension WelcomeViewController {
     }
     
     func setupViewHierarchy() {
-        [backgroundImageView, appIconImageView, topImageContainerView, leftImageContainerView, rightImageContainerView, welcomeTitleLabel, welcomeSubtitleLabel, signStack].forEach { view.addSubview($0) }
-        topImageContainerView.addSubview(topImageView)
-        leftImageContainerView.addSubview(leftImageView)
-        rightImageContainerView.addSubview(rightImageView)
+        [backgroundImageView, appIconImageView, topImageView, leftImageView, rightImageView, welcomeTitleLabel, welcomeSubtitleLabel, signStack].forEach { view.addSubview($0) }
         signStack.addArrangedSubview(signUpButton)
         signStack.addArrangedSubview(signInButton)
     }
     
     func setupConstraints() {
-        [backgroundImageView, appIconImageView, topImageContainerView, topImageView, leftImageContainerView, leftImageView, rightImageContainerView, rightImageView, welcomeTitleLabel, welcomeSubtitleLabel, signStack, signUpButton, signInButton].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        [backgroundImageView, appIconImageView, topImageView, leftImageView, rightImageView, welcomeTitleLabel, welcomeSubtitleLabel, signStack, signUpButton, signInButton].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         
         NSLayoutConstraint.activate([
             
@@ -129,35 +112,19 @@ private extension WelcomeViewController {
             backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            topImageView.centerXAnchor.constraint(equalTo: topImageContainerView.centerXAnchor),
-            topImageView.centerYAnchor.constraint(equalTo: topImageContainerView.centerYAnchor),
-            topImageView.widthAnchor.constraint(equalToConstant: Constants.topImageViewWidth),
-            topImageView.heightAnchor.constraint(equalToConstant: Constants.topImageViewHeight),
-            
-            leftImageView.centerXAnchor.constraint(equalTo: leftImageContainerView.centerXAnchor),
-            leftImageView.centerYAnchor.constraint(equalTo: leftImageContainerView.centerYAnchor),
-            leftImageView.widthAnchor.constraint(equalToConstant: Constants.leftImageViewWidth),
-            leftImageView.heightAnchor.constraint(equalToConstant: Constants.leftImageViewHeight),
-            
-            rightImageView.centerXAnchor.constraint(equalTo: rightImageContainerView.centerXAnchor),
-            rightImageView.centerYAnchor.constraint(equalTo: rightImageContainerView.centerYAnchor),
-            rightImageView.widthAnchor.constraint(equalToConstant: Constants.rightImageViewWidth),
-            rightImageView.heightAnchor.constraint(equalToConstant: Constants.rightImageViewHeight),
-            
-            topImageContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            topImageContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.topImageViewTopSpacing),
-            
+            topImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            topImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.topImageViewTopSpacing),
             
             appIconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            appIconImageView.topAnchor.constraint(equalTo: topImageContainerView.bottomAnchor, constant: Constants.appIconImageViewTopSpacing),
+            appIconImageView.topAnchor.constraint(equalTo: topImageView.bottomAnchor, constant: Constants.appIconImageViewTopSpacing),
             appIconImageView.widthAnchor.constraint(equalToConstant: Constants.appIconImageViewWidth),
             appIconImageView.heightAnchor.constraint(equalToConstant: Constants.appIconImageViewHeight),
             
-            leftImageContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.leftImageViewLeadingSpacing),
-            leftImageContainerView.topAnchor.constraint(equalTo: topImageContainerView.bottomAnchor, constant: Constants.leftImageViewTopSpacing),
+            leftImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.leftImageViewLeadingSpacing),
+            leftImageView.topAnchor.constraint(equalTo: topImageView.topAnchor, constant: Constants.leftImageViewTopSpacing),
             
-            rightImageContainerView.topAnchor.constraint(equalTo: topImageContainerView.bottomAnchor, constant: Constants.rightImageViewTopSpacing),
-            rightImageContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.rightImageViewTrailingSpacing),
+            rightImageView.topAnchor.constraint(equalTo: topImageView.topAnchor, constant: Constants.rightImageViewTopSpacing),
+            rightImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.rightImageViewTrailingSpacing),
             
             welcomeTitleLabel.topAnchor.constraint(equalTo: appIconImageView.bottomAnchor, constant: Constants.welcomeTitleLabelTopSpacing),
             welcomeTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -174,49 +141,6 @@ private extension WelcomeViewController {
             signUpButton.heightAnchor.constraint(equalToConstant: Constants.signUpButtonHeight),
             
         ])
-        
-        setupContainerSizes()
-    }
-    
-    private func setupContainerSizes() {
-        let topContainerSize = calculateRotatedSize(
-            width: Constants.topImageViewWidth,
-            height: Constants.topImageViewHeight,
-            angle: Constants.topImageViewRotateAngle
-        )
-        
-        let leftContainerSize = calculateRotatedSize(
-            width: Constants.leftImageViewWidth,
-            height: Constants.leftImageViewHeight,
-            angle: Constants.leftImageViewRotateAngle
-        )
-        
-        let rightContainerSize = calculateRotatedSize(
-            width: Constants.rightImageViewWidth,
-            height: Constants.rightImageViewHeight,
-            angle: Constants.rightImageViewRotateAngle
-        )
-        
-        NSLayoutConstraint.activate([
-            topImageContainerView.widthAnchor.constraint(equalToConstant: topContainerSize.width),
-            topImageContainerView.heightAnchor.constraint(equalToConstant: topContainerSize.height),
-            
-            leftImageContainerView.widthAnchor.constraint(equalToConstant: leftContainerSize.width),
-            leftImageContainerView.heightAnchor.constraint(equalToConstant: leftContainerSize.height),
-            
-            rightImageContainerView.widthAnchor.constraint(equalToConstant: rightContainerSize.width),
-            rightImageContainerView.heightAnchor.constraint(equalToConstant: rightContainerSize.height),
-        ])
-    }
-    
-    private func calculateRotatedSize(width: CGFloat, height: CGFloat, angle: CGFloat) -> CGSize {
-        let cosAngle = abs(cos(angle))
-        let sinAngle = abs(sin(angle))
-        
-        let rotatedWidth = width * cosAngle + height * sinAngle
-        let rotatedHeight = width * sinAngle + height * cosAngle
-        
-        return CGSize(width: rotatedWidth, height: rotatedHeight)
     }
     
     func configureViews() {
@@ -228,21 +152,12 @@ private extension WelcomeViewController {
         appIconImageView.image = UIImage(named: "appIcon")
         appIconImageView.contentMode = .scaleAspectFill
         
-        topImageContainerView.backgroundColor = .blue
-        
-        topImageView.backgroundColor = .red
         topImageView.image = UIImage(named: "welcomeTopImage")
         topImageView.contentMode = .scaleAspectFill
         
-        leftImageContainerView.backgroundColor = .blue
-        
-        leftImageView.backgroundColor = .red
         leftImageView.image = UIImage(named: "welcomeLeftImage")
         leftImageView.contentMode = .scaleAspectFill
         
-        rightImageContainerView.backgroundColor = .blue
-        
-        rightImageView.backgroundColor = .red
         rightImageView.image = UIImage(named: "welcomeRightImage")
         rightImageView.contentMode = .scaleAspectFill
         
@@ -281,6 +196,6 @@ private extension WelcomeViewController {
 
 private extension WelcomeViewController {
     @objc func buttonTapped() {
-        navigationController?.pushViewController(AuthViewController(), animated: true)
+        completionHandler?(())
     }
 }

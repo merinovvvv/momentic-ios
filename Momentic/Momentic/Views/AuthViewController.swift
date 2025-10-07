@@ -9,6 +9,10 @@ import UIKit
 
 final class AuthViewController: UIViewController {
     
+    //MARK: - FlowController
+    
+    var completionHandler: (([String]) -> ())?
+    
     //MARK: - Properties
     
     var authMode: AuthMode = .signUp
@@ -230,6 +234,9 @@ private extension AuthViewController {
             $0.layer.cornerRadius = Constants.authTextFieldCornerRadius
             $0.textAlignment = .left
             
+            $0.isUserInteractionEnabled = true
+            $0.isEnabled = true
+            
             let leftPaddingView = UIView(frame: CGRect(x: .zero, y: .zero, width: Constants.authTextFieldPadding, height: .zero))
             let rightPaddingView = UIView(frame: CGRect(x: .zero, y: .zero, width: Constants.authTextFieldPadding, height: .zero))
             
@@ -359,6 +366,9 @@ extension AuthViewController: UITextFieldDelegate {
 
 private extension AuthViewController {
     @objc func authButtonTapped() {
+        
+        completionHandler?([emailTextField.text ?? "", passwordTextField.text ?? ""])
+        
         //TODO: - add logic
         
         [emailTextField, passwordTextField].forEach {

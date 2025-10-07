@@ -7,7 +7,10 @@
 
 import UIKit
 
-final class VerificationCodeViewController: UIViewController {
+final class VerificationCodeViewController: UIViewController, FlowController {
+    
+    //MARK: - FlowController
+    var completionHandler: ((()) -> ())?
     
     //MARK: - Properties
     
@@ -57,6 +60,39 @@ final class VerificationCodeViewController: UIViewController {
     
     private let sendAgainButton: UIButton = UIButton(type: .system)
     
+    //MARK: - Private Methods
+    
+    private func setupCodeInputCallbacks() {
+        codeInputView.onCodeComplete = { [weak self] code in
+            self?.verifyCode(code)
+        }
+    }
+    
+    private func verifyCode(_ code: String) {
+        
+        //TODO: - Replace with actual verification logic
+        
+        let isCorrect = code == "12345"
+        
+        if isCorrect {
+            handleSuccess()
+        } else {
+            handleError()
+        }
+    }
+    
+    private func handleSuccess() {
+        codeInputView.showSuccess()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.completionHandler?(())
+        }
+    }
+    
+    private func handleError() {
+        codeInputView.showError()
+    }
+    
     //MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -65,6 +101,7 @@ final class VerificationCodeViewController: UIViewController {
         setupUI()
         setupKeyboardObservers()
         setupTapGesture()
+        setupCodeInputCallbacks()
     }
     
     deinit {

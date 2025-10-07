@@ -21,11 +21,8 @@ final class CodeInputView: UIView {
         return CGSize(width: UIView.noIntrinsicMetric, height: Constants.digitViewHeight)
     }
     
-    //TODO: - Add in ViewModel
-    //    var onCodeComplete: ((String) -> Void)?
-    //    var onCodeChanged: ((String) -> Void)?
     
-    private let isCorrect: Bool = false
+    var onCodeComplete: ((String) -> Void)?
     
     //MARK: - Constants
     
@@ -84,9 +81,7 @@ final class CodeInputView: UIView {
         updateDigitViews(with: trimmedCode)
     }
     
-    //TODO: - How it works
-    
-    private func showError() {
+    func showError() {
         let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         animation.timingFunction = CAMediaTimingFunction(name: .linear)
         animation.duration = 0.5
@@ -114,7 +109,7 @@ final class CodeInputView: UIView {
         }
     }
     
-    private func showSuccess() {
+    func showSuccess() {
         digitViews.forEach {
             $0.layer.borderColor = UIColor(named: "lightGreen")?.cgColor
         }
@@ -232,16 +227,9 @@ private extension CodeInputView {
         
         updateDigitViews(with: text)
         
-        //onCodeChanged?(text)
-        
         if text.count == numberOfDigits {
-            //onCodeComplete?(text)
+            onCodeComplete?(text)
             textField.resignFirstResponder()
-            if isCorrect {
-                showSuccess()
-            } else {
-                showError()
-            }
         }
     }
     

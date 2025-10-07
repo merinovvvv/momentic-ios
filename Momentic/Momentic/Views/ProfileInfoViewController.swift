@@ -7,7 +7,11 @@
 
 import UIKit
 
-final class ProfileInfoViewController: UIViewController {
+final class ProfileInfoViewController: UIViewController, FlowController {
+    
+    //MARK: - FlowController
+    var completionHandler: (([String?]) -> ())?
+    
     
     //MARK: - Properties
     
@@ -243,12 +247,22 @@ private extension ProfileInfoViewController {
         signUpButton.backgroundColor = UIColor(named: "main")
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.signUpButtonTitleFontSize, weight: .medium)
+        
+        signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
     }
     
     func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
+    }
+}
+
+//MARK: - Selectors
+
+private extension ProfileInfoViewController {
+    @objc func signUpButtonTapped() {
+        completionHandler?([nameTextField.text, surnameTextField.text, bioTextView.text])
     }
 }
 
