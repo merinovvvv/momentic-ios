@@ -33,3 +33,5 @@
 
 "add_photo_title" = "Add photo";
 "add_photo_subtitle" = "Accounts with profile photo are more likely to be recognised by other users";
+"skip_this_step_button" = "Skip this step";
+
