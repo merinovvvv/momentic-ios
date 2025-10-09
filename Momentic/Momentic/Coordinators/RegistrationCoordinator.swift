@@ -10,6 +10,7 @@ import UIKit
 final class RegistrationCoordinator: Coordinator {
     
     var navigationController: UINavigationController
+    
     var flowCompletionHandler: (() -> Void)?
     
     private let moduleFactory: ModuleFactory = ModuleFactory()
@@ -20,21 +21,14 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     func start() {
-        showWelcomeModule()
+        showSignUpModule()
     }
     
-    private func showWelcomeModule() {
-        let welcomeViewController = moduleFactory.createWelcomeModule()
+    private func showSignUpModule() {
         
-        welcomeViewController.completionHandler = { [weak self] _ in
-            self?.showEnterLoginPasswordModule()
-        }
+        let authViewModel = AuthViewModel(authMode: .signUp)
         
-        navigationController.pushViewController(welcomeViewController, animated: true)
-    }
-    
-    private func showEnterLoginPasswordModule() {
-        let authViewController = moduleFactory.createEnterEmailPasswordModule()
+        let authViewController = moduleFactory.createEnterEmailPasswordModule(with: authViewModel)
         
         authViewController.completionHandler = { [weak self] userInfo in
             self?.userData.email = userInfo[0]

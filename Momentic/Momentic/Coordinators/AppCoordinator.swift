@@ -10,7 +10,6 @@ import UIKit
 final class AppCoordinator: Coordinator {
     
     var navigationController: UINavigationController
-    var flowCompletionHandler: (() -> Void)?
     
     private var childCoordinators: [Coordinator] = []
     
@@ -24,17 +23,51 @@ final class AppCoordinator: Coordinator {
         if isAuth {
             showMainFlow()
         } else {
-            showRegistrationFlow()
+            showAuthFlow()
         }
+    }
+    
+    private func showAuthFlow() {
+        let authCoordinator = CoordinatorFactory().createAuthCoordinator(navigationController: navigationController
+        )
+        
+        authCoordinator.flowCompletionHandler = { [weak self] authMode in
+            switch authMode {
+            case .signIn:
+                self?.showLoginFlow()
+            case .signUp:
+                self?.showRegistrationFlow()
+            }
+        }
+        
+        childCoordinators.append(authCoordinator)
+        authCoordinator.start()
+    }
+    
+    private func showLoginFlow() {
+        let loginCoordinator = CoordinatorFactory().createLoginCoordinator(navigationController: navigationController)
+        
+        loginCoordinator.flowCompletionHandler = { [weak self] in
+            self?.showMainFlow()
+        }
+        
+        childCoordinators.append(loginCoordinator)
+        loginCoordinator.start()
+        
     }
     
     private func showRegistrationFlow() {
         let registrationCoordinator = CoordinatorFactory().createRegistrationCoordinator(navigationController: navigationController)
+        
+        registrationCoordinator.flowCompletionHandler = {[weak self] in
+            self?.showMainFlow()
+        }
+        
         childCoordinators.append(registrationCoordinator)
         registrationCoordinator.start()
     }
     
     private func showMainFlow() {
-        //TODO: - go to main
+        navigationController.pushViewController(MainViewController(), animated: true)
     }
 }

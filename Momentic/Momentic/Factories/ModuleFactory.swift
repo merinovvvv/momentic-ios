@@ -15,8 +15,8 @@ final class ModuleFactory {
         WelcomeViewController()
     }
     
-    func createEnterEmailPasswordModule() -> AuthViewController {
-        AuthViewController()
+    func createEnterEmailPasswordModule(with authViewModel: AuthViewModel) -> AuthViewController {
+        AuthViewController(viewModel: authViewModel)
     }
     
     func createEnterCodeModule() -> VerificationCodeViewController {
@@ -31,11 +31,7 @@ final class ModuleFactory {
         AddPhotoViewController()
     }
     
-    //MARK: - Login
-    
-//    func createEnterEmailPasswordModule() -> AuthViewController {
-//        AuthViewController()
-//    }
-    
-    
+    func createMainModule() -> MainViewController {
+        MainViewController()
+    }
 }

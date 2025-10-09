@@ -19,11 +19,14 @@ final class LoginCoordinator: Coordinator {
     }
     
     func start() {
-        showEnterLoginPasswordModule()
+        showSignInModule()
     }
     
-    private func showEnterLoginPasswordModule() {
-        let authViewController = moduleFactory.createEnterEmailPasswordModule()
+    private func showSignInModule() {
+        
+        let authViewModel = AuthViewModel(authMode: .signIn)
+        
+        let authViewController = moduleFactory.createEnterEmailPasswordModule(with: authViewModel)
         
         authViewController.completionHandler = { [weak self] userInfo in
             //TODO: - add verification logic
@@ -39,6 +42,7 @@ final class LoginCoordinator: Coordinator {
         
         verificationCodeViewController.completionHandler = { [weak self] _ in
             //TODO: - finish login
+            self?.flowCompletionHandler?()
         }
         
         navigationController.pushViewController(verificationCodeViewController, animated: true)

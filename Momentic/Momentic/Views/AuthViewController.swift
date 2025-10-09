@@ -15,7 +15,9 @@ final class AuthViewController: UIViewController {
     
     //MARK: - Properties
     
-    var authMode: AuthMode = .signUp
+    var viewModel: AuthViewModel
+    
+    //var authMode: AuthMode = .signUp
     
     //MARK: - Constants
     
@@ -100,6 +102,15 @@ final class AuthViewController: UIViewController {
         setupUI()
         setupKeyboardObservers()
         setupTapGesture()
+    }
+    
+    init(viewModel: AuthViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     deinit {
@@ -188,7 +199,7 @@ private extension AuthViewController {
         
         appIconImageView.image = UIImage(named: "appIcon")
         
-        switch authMode {
+        switch viewModel.authMode {
         case .signUp:
             authLabel.text = NSLocalizedString("signup_button_text", comment: "SignUp")
             authButton.setTitle(NSLocalizedString("signup_button_text", comment: "SignUp"), for: .normal)

@@ -10,7 +10,7 @@ import UIKit
 final class WelcomeViewController: UIViewController, FlowController {
     
     //MARK: - FlowController
-    var completionHandler: ((()) -> ())?
+    var completionHandler: ((AuthMode) -> ())?
     
     //MARK: - Constants
     
@@ -182,20 +182,24 @@ private extension WelcomeViewController {
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.tintColor = .white
         signUpButton.clipsToBounds = true
-        signUpButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
         
         signInButton.setTitle(NSLocalizedString("signin_label_text", comment: "Sign in"), for: .normal)
         signInButton.titleLabel?.font = .systemFont(ofSize: Constants.signInButtonFontSize, weight: .medium)
         signInButton.backgroundColor = .clear
         signInButton.tintColor = UIColor(named: "lightGreen")
-        signInButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        signInButton.addTarget(self, action: #selector(signInButtonTapped), for: .touchUpInside)
     }
 }
 
 //MARK: - Selectors
 
 private extension WelcomeViewController {
-    @objc func buttonTapped() {
-        completionHandler?(())
+    @objc func signUpButtonTapped() {
+        completionHandler?(AuthMode.signUp)
+    }
+    
+    @objc func signInButtonTapped() {
+        completionHandler?(AuthMode.signIn)
     }
 }

@@ -10,7 +10,8 @@ import UIKit
 final class AuthCoordinator: Coordinator {
     
     var navigationController: UINavigationController
-    var flowCompletionHandler: (() -> Void)?
+    
+    var flowCompletionHandler: ((AuthMode) -> Void)?
     
     private let moduleFactory: ModuleFactory = ModuleFactory()
     
@@ -19,15 +20,16 @@ final class AuthCoordinator: Coordinator {
     }
     
     func start() {
+        showWelcomeModule()
+    }
+    
+    private func showWelcomeModule() {
         let welcomeViewController = moduleFactory.createWelcomeModule()
         
-        welcomeViewController.completionHandler = { [weak self] _ in
-            self?.a()
+        welcomeViewController.completionHandler = { [weak self] authMode in
+            self?.flowCompletionHandler?(authMode)
         }
         
         navigationController.pushViewController(welcomeViewController, animated: true)
     }
-    
-    func a() {}
-    
 }
