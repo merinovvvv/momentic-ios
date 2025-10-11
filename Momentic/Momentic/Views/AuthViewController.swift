@@ -17,8 +17,6 @@ final class AuthViewController: UIViewController {
     
     var viewModel: AuthViewModel
     
-    //var authMode: AuthMode = .signUp
-    
     //MARK: - Constants
     
     private enum Constants {
@@ -258,6 +256,8 @@ private extension AuthViewController {
             
             $0.delegate = self
         }
+        
+        passwordTextField.isSecureTextEntry = true
         
         authButton.backgroundColor = UIColor(named: "main")
         authButton.tintColor = .white

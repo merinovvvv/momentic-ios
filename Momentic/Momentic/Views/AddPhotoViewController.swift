@@ -12,7 +12,6 @@ final class AddPhotoViewController: UIViewController, FlowController {
     //MARK: - FlowController
     var completionHandler: ((()) -> ())?
     
-    
     //MARK: - Properties
     
     //MARK: - Constants

@@ -12,7 +12,6 @@ final class ProfileInfoViewController: UIViewController, FlowController {
     //MARK: - FlowController
     var completionHandler: (([String?]) -> ())?
     
-    
     //MARK: - Properties
     
     private var activeTextField: UIView?
