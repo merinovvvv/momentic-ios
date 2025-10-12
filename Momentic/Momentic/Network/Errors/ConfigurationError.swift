@@ -7,4 +7,5 @@
 
 enum ConfigurationError: Error {
     case nilObject
+    case serializationFailed
 }
