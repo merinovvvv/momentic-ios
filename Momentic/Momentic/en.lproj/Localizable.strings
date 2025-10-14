@@ -16,7 +16,7 @@
 "email_textfield_placeholder" = "Mail given you by the uni";
 "password_label_text" = "Password";
 "password_textfield_placeholder" = "Input your password here";
-"email_error_text" = "Mail should be written in format: surname.faculty@bsu.by";
+"email_error_text" = "Mail should be written in format: faculty.surname@bsu.by";
 "password_error_text" = "Password should include lower and upper case plus numbers";
 
 "enter_code_text" = "Enter code";

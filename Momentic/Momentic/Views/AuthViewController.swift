@@ -9,13 +9,10 @@ import UIKit
 
 final class AuthViewController: UIViewController {
     
-    //MARK: - FlowController
-    
-    var completionHandler: (([String]) -> ())?
-    
     //MARK: - Properties
     
-    var viewModel: AuthViewModel
+    var completionHandler: ((UserCredentials) -> ())?
+    var viewModel: AuthViewModelProtocol
     
     //MARK: - Constants
     
@@ -100,9 +97,12 @@ final class AuthViewController: UIViewController {
         setupUI()
         setupKeyboardObservers()
         setupTapGesture()
+        setupBindings()
     }
     
-    init(viewModel: AuthViewModel) {
+    //MARK: - Init
+    
+    init(viewModel: AuthViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -113,6 +113,77 @@ final class AuthViewController: UIViewController {
     
     deinit {
         removeKeyboardObservers()
+    }
+}
+
+//MARK: - Setup Bindings
+
+private extension AuthViewController {
+    func setupBindings() {
+        
+        viewModel.onValidationErrors = { [weak self] errors in
+            
+            guard let strongSelf = self else { return }
+            
+            [strongSelf.emailTextField, strongSelf.passwordTextField].forEach {
+                $0.resignFirstResponder()
+                $0.text = ""
+            }
+            
+            errors.forEach { error in
+                switch error {
+                case .invalidEmail:
+                    strongSelf.showEmailError(error.localizedDescription)
+                    
+                case .invalidPassword:
+                    strongSelf.showPasswordError(error.localizedDescription)
+                }
+            }
+        }
+        
+        
+        viewModel.onFailure = { [weak self] error in
+            
+            guard let strongSelf = self else { return }
+            
+            [strongSelf.emailTextField, strongSelf.passwordTextField].forEach {
+                $0.resignFirstResponder()
+                $0.text = ""
+            }
+            
+            strongSelf.showAlert(title: "Error", message: error.localizedDescription)
+        }
+    }
+    
+    func showEmailError(_ message: String) {
+        wrongEmailLabel.text = message
+        wrongEmailLabel.isHidden = false
+        
+        emailTextField.layer.borderWidth = Constants.authTextFieldBorderWidth
+        emailTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+        emailTextField.attributedPlaceholder = NSAttributedString(
+            string: emailTextField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+        )
+    }
+    
+    func showPasswordError(_ message: String) {
+        wrongPasswordLabel.text = message
+        wrongPasswordLabel.isHidden = false
+        
+        passwordTextField.layer.borderWidth = Constants.authTextFieldBorderWidth
+        passwordTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+        passwordTextField.attributedPlaceholder = NSAttributedString(
+            string: passwordTextField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+        )
+    }
+    
+    func showAlert(title: String, message: String) {
+        let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        errorAlert.addAction(action)
+        present(errorAlert, animated: true)
     }
 }
 
@@ -197,14 +268,8 @@ private extension AuthViewController {
         
         appIconImageView.image = UIImage(named: "appIcon")
         
-        switch viewModel.authMode {
-        case .signUp:
-            authLabel.text = NSLocalizedString("signup_button_text", comment: "SignUp")
-            authButton.setTitle(NSLocalizedString("signup_button_text", comment: "SignUp"), for: .normal)
-        case .signIn:
-            authLabel.text = NSLocalizedString("signin_button_text", comment: "SignIn")
-            authButton.setTitle(NSLocalizedString("signin_button_text", comment: "SignIn"), for: .normal)
-        }
+        authLabel.text = viewModel.authText
+        authButton.setTitle(viewModel.authText, for: .normal)
         
         authLabel.textColor = UIColor(named: "main")
         authLabel.font = UIFont.systemFont(ofSize: Constants.authLabelFontSize, weight: .medium)
@@ -233,8 +298,15 @@ private extension AuthViewController {
             $0.textAlignment = .left
         }
         
-        emailTextField.placeholder = NSLocalizedString("email_textfield_placeholder", comment: "emailTextFieldPlaceholder")
-        passwordTextField.placeholder = NSLocalizedString("password_textfield_placeholder", comment: "passwordTextFieldPlaceholder")
+        emailTextField.attributedPlaceholder = NSAttributedString(
+            string: NSLocalizedString("email_textfield_placeholder", comment: "emailTextFieldPlaceholder"),
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "subtitle") ?? .black]
+        )
+        
+        passwordTextField.attributedPlaceholder = NSAttributedString(
+            string: NSLocalizedString("password_textfield_placeholder", comment: "passwordTextFieldPlaceholder"),
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "subtitle") ?? .black]
+        )
         
         [emailTextField, passwordTextField].forEach {
             $0.backgroundColor = UIColor(named: "backgroundGray")
@@ -269,9 +341,22 @@ private extension AuthViewController {
             $0.textColor = UIColor(named: "wrongInput")
             $0.font = UIFont.systemFont(ofSize: Constants.errorLabelFontSize, weight: .light)
         }
+    }
+    
+    private func createLabelContainer(for label: UILabel) -> UIView {
+        let container = UIView()
+        container.addSubview(label)
         
-        wrongEmailLabel.text = NSLocalizedString("email_error_text", comment: "Wrong email format")
-        wrongPasswordLabel.text = NSLocalizedString("password_error_text", comment: "Wrong password format")
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: container.topAnchor),
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Constants.authInfoLabelInnerHorizontalSpacing),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        
+        return container
     }
 }
 
@@ -347,7 +432,10 @@ private extension AuthViewController {
 extension AuthViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
-        [wrongEmailLabel, wrongPasswordLabel].forEach { $0.isHidden = true }
+        [wrongEmailLabel, wrongPasswordLabel].forEach {
+            $0.isHidden = true
+        }
+        resetAllTextFieldsToNormalState()
         
         textField.backgroundColor = .white
         textField.layer.borderColor = UIColor(named: "subtitle")?.cgColor
@@ -371,6 +459,16 @@ extension AuthViewController: UITextFieldDelegate {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "subtitle") ?? .black]
         )
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailTextField {
+            passwordTextField.becomeFirstResponder()
+        } else {
+            view.endEditing(true)
+        }
+        
+        return false
+    }
 }
 
 //MARK: - Selectors
@@ -378,42 +476,24 @@ extension AuthViewController: UITextFieldDelegate {
 private extension AuthViewController {
     @objc func authButtonTapped() {
         
-        completionHandler?([emailTextField.text ?? "", passwordTextField.text ?? ""])
-        
-        //TODO: - add logic
-        
-        [emailTextField, passwordTextField].forEach {
-            
-            $0.resignFirstResponder()
-            
-            $0.text = ""
-            
-            $0.layer.borderWidth = Constants.authTextFieldBorderWidth
-            $0.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
-            $0.attributedPlaceholder = NSAttributedString(
-                string: $0.placeholder ?? "",
-                attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
-            )
-        }
-        
-        [wrongEmailLabel, wrongPasswordLabel].forEach { $0.isHidden = false }
+        completionHandler?(UserCredentials(email: emailTextField.text ?? "", password: passwordTextField.text ?? ""))
     }
 }
 
+//MARK: - Helpers
+
 private extension AuthViewController {
-    func createLabelContainer(for label: UILabel) -> UIView {
-        let container = UIView()
-        container.addSubview(label)
-        
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: container.topAnchor),
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Constants.authInfoLabelInnerHorizontalSpacing),
-            label.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            label.bottomAnchor.constraint(equalTo: container.bottomAnchor)
-        ])
-        
-        return container
+    private func resetAllTextFieldsToNormalState() {
+        [emailTextField, passwordTextField].forEach { textField in
+            textField.backgroundColor = UIColor(named: "backgroundGray")
+            textField.layer.borderWidth = .zero
+            textField.layer.borderColor = nil
+            textField.textColor = UIColor(named: "subtitle")
+            
+            textField.attributedPlaceholder = NSAttributedString(
+                string: textField.placeholder ?? "",
+                attributes: [.foregroundColor: UIColor(named: "subtitle") ?? .black]
+            )
+        }
     }
 }

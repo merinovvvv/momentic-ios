@@ -14,7 +14,6 @@ final class RegistrationCoordinator: Coordinator {
     var flowCompletionHandler: (() -> Void)?
     
     private let moduleFactory: ModuleFactory = ModuleFactory()
-    private var userData: UserData = UserData(email: nil, password: nil, name: nil, surname: nil, bio: nil)
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -26,18 +25,22 @@ final class RegistrationCoordinator: Coordinator {
     
     private func showSignUpModule() {
         
-        let authViewModel = AuthViewModel(authMode: .signUp)
+        let registerViewModel = RegisterViewModel(networkHandler: .init())
         
-        let authViewController = moduleFactory.createEnterEmailPasswordModule(with: authViewModel)
-        
-        authViewController.completionHandler = { [weak self] userInfo in
-            self?.userData.email = userInfo[0]
-            self?.userData.password = userInfo[1]
-            
+        registerViewModel.onSuccess = { [weak self] in
             self?.showEnterCodeModule()
         }
         
-        navigationController.pushViewController(authViewController, animated: true)
+        let registerViewController = moduleFactory.createRegisterModule(with: registerViewModel)
+        
+        registerViewController.completionHandler = { credentials in
+            registerViewController.viewModel.email = credentials.email
+            registerViewController.viewModel.password = credentials.password
+        
+            registerViewModel.submit()
+        }
+        
+        navigationController.pushViewController(registerViewController, animated: true)
     }
     
     private func showEnterCodeModule() {
@@ -54,9 +57,9 @@ final class RegistrationCoordinator: Coordinator {
         let profileInfoViewController = moduleFactory.createProfileInfoModule()
         
         profileInfoViewController.completionHandler = { [weak self] userInfo in
-            self?.userData.name = userInfo[0]
-            self?.userData.surname = userInfo[1]
-            self?.userData.bio = userInfo[2]
+//            self?.userData.name = userInfo[0]
+//            self?.userData.surname = userInfo[1]
+//            self?.userData.bio = userInfo[2]
             
             self?.showAddPhotoModule()
         }

@@ -24,7 +24,7 @@ enum ContentType: String{
 final class NetworkHandler {
     func request(
         _ url: URL,
-        jsonDictionary: Any? = nil,
+        jsonDictionary: Encodable? = nil,
         httpMethod: String = HTTPMethod.get.rawValue,
         contentType: String? = ContentType.json.rawValue,
         accessToken: String? = nil,
@@ -38,18 +38,35 @@ final class NetworkHandler {
             accessToken: accessToken
         )
         
-        if let jsonDictionary, let httpBody = try? JSONSerialization.data(withJSONObject: jsonDictionary) {
+        if let jsonDictionary, let httpBody = try? JSONEncoder().encode(jsonDictionary) {
             urlRequest.httpBody = httpBody
         } else if jsonDictionary != nil {
-            print("Could not serialize object into JSON data")
-            completion(.failure(ConfigurationError.serializationFailed))
+            print("Could not encode object into JSON data")
+            completion(.failure(NetworkError.encodingError))
+            return
         }
         
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             
             guard let data else {
                 if let error {
-                    completion(.failure(NetworkError.dataError("\(error)")))
+                    let nsError = error as NSError
+                    
+                    switch nsError.code {
+                    case NSURLErrorNotConnectedToInternet,
+                    NSURLErrorNetworkConnectionLost:
+                        completion(.failure(NetworkError.noResponse))
+                        
+                    case NSURLErrorTimedOut:
+                        completion(.failure(NetworkError.dataError("Request timed out")))
+                        
+                    case NSURLErrorCannotConnectToHost:
+                        completion(.failure(NetworkError.dataError("Cannot connect to server")))
+                        
+                    default:
+                        completion(.failure(NetworkError.dataError(error.localizedDescription)))
+                    }
+                    return
                 }
                 completion(.failure(NetworkError.dataError("No data")))
                 return
@@ -75,7 +92,7 @@ final class NetworkHandler {
     func request<ResponseType: Decodable>(
         _ url: URL,
         responseType: ResponseType.Type,
-        jsonDictionary: Any? = nil,
+        jsonDictionary: Encodable? = nil,
         httpMethod: String = HTTPMethod.get.rawValue,
         contentType: String? = ContentType.json.rawValue,
         accessToken: String? = nil,
@@ -87,7 +104,6 @@ final class NetworkHandler {
                 do {
                     let decodedData = try JSONDecoder().decode(responseType, from: data)
                     completion(.success(decodedData))
-                    
                 } catch {
                     print("Could not decode data: \(error)")
                     completion(.failure(NetworkError.decodingError))

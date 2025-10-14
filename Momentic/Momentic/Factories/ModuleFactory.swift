@@ -15,10 +15,14 @@ final class ModuleFactory {
         WelcomeViewController()
     }
     
-    func createEnterEmailPasswordModule(with authViewModel: AuthViewModel) -> AuthViewController {
-        AuthViewController(viewModel: authViewModel)
+    func createLoginModule(with viewModel: LoginViewModel) -> AuthViewController {
+        AuthViewController(viewModel: viewModel)
     }
     
+    func createRegisterModule(with viewModel: RegisterViewModel) -> AuthViewController {
+        AuthViewController(viewModel: viewModel)
+    }
+
     func createEnterCodeModule() -> VerificationCodeViewController {
         VerificationCodeViewController()
     }

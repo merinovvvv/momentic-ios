@@ -24,17 +24,23 @@ final class LoginCoordinator: Coordinator {
     
     private func showSignInModule() {
         
-        let authViewModel = AuthViewModel(authMode: .signIn)
+        let loginViewModel = LoginViewModel(networkHandler: .init(), tokenStorage: .init())
         
-        let authViewController = moduleFactory.createEnterEmailPasswordModule(with: authViewModel)
-        
-        authViewController.completionHandler = { [weak self] userInfo in
-            //TODO: - add verification logic
-            
+        loginViewModel.onSuccess = { [weak self] in
             self?.showEnterCodeModule()
         }
         
-        navigationController.pushViewController(authViewController, animated: true)
+        let loginViewController = moduleFactory.createLoginModule(with: loginViewModel)
+        
+        loginViewController.completionHandler = { credentials in
+            
+            loginViewController.viewModel.email = credentials.email
+            loginViewController.viewModel.password = credentials.password
+            
+            loginViewController.viewModel.submit()
+        }
+        
+        navigationController.pushViewController(loginViewController, animated: true)
     }
     
     private func showEnterCodeModule() {

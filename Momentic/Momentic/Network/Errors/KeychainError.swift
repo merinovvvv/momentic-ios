@@ -5,8 +5,21 @@
 //  Created by Yaraslau Merynau on 11.10.25.
 //
 
-enum KeychainError: Error {
+import Foundation
+
+enum KeychainError: LocalizedError {
     case saveFailed
-    case retreiveFailed
+    case retrieveFailed
     case deleteFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .saveFailed:
+            return "Failed to save data to secure storage"
+        case .retrieveFailed:
+            return "Failed to retrieve data from secure storage"
+        case .deleteFailed:
+            return "Failed to delete data from secure storage"
+        }
+    }
 }

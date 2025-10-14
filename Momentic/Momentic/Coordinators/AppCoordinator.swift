@@ -13,18 +13,28 @@ final class AppCoordinator: Coordinator {
     
     private var childCoordinators: [Coordinator] = []
     
+    let tokenStorage: AccessTokenStorage = AccessTokenStorage()
+    let didLaunchFirstTime = "com.momentic.auth"
+    
+    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
     
     func start() {
-        let isAuth: Bool = false
         
-        if isAuth {
-            showMainFlow()
-        } else {
-            showAuthFlow()
-        }
+//        if !UserDefaults.standard.bool(forKey: didLaunchFirstTime) {
+//            tokenStorage.delete()
+//            UserDefaults.standard.set(true, forKey: didLaunchFirstTime)
+//        }
+//        
+//        if tokenStorage.get() != nil {
+//            showMainFlow()
+//        } else {
+//            showAuthFlow()
+//        }
+        
+        showAuthFlow()
     }
     
     private func showAuthFlow() {
