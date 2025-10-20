@@ -330,6 +330,12 @@ private extension AuthViewController {
         }
         
         passwordTextField.isSecureTextEntry = true
+        passwordTextField.textContentType = .none
+        //passwordTextField.autocorrectionType = .no
+        passwordTextField.textContentType = UITextContentType(rawValue: "")
+        
+        emailTextField.textContentType = .none
+        emailTextField.autocorrectionType = .no
         
         authButton.backgroundColor = UIColor(named: "main")
         authButton.tintColor = .white

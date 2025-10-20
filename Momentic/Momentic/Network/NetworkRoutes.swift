@@ -9,10 +9,12 @@ import Foundation
 
 enum NetworkRoutes {
     
-    private static let baseURL: String = "http://127.0.0.1:8080/"
+    private static let baseURL: String = "http://127.0.0.1:8080/api/"
     
     case register
     case login
+    case verify
+    case resendVerify
     //case refreshToken
     //case verifyCode
     //case fetchSecureData
@@ -26,6 +28,10 @@ enum NetworkRoutes {
             path = NetworkRoutes.baseURL + "auth/login/"
 //        case .fetchSecureData:
 //            path = NetworkRoutes.baseURL + "login_data/"
+        case .verify:
+            path = NetworkRoutes.baseURL + "auth/verify-code/"
+        case .resendVerify:
+            path = NetworkRoutes.baseURL + "auth/resend-verify-code/"
         }
         
         return URL(string: path)
@@ -34,7 +40,7 @@ enum NetworkRoutes {
     var httpMethod: HTTPMethod {
         switch self {
             
-        case .register, .login: .post
+        case .register, .login, .verify, .resendVerify: .post
         //case .fetchSecureData: .get
             
         }

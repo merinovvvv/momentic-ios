@@ -44,7 +44,10 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     private func showEnterCodeModule() {
-        let verificationCodeViewController = moduleFactory.createEnterCodeModule()
+        
+        let verificationCodeViewModel = VerificationCodeViewModel(networkHandler: .init())
+        
+        let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
         
         verificationCodeViewController.completionHandler = { [weak self] _ in
             self?.showProfileInfoModule()

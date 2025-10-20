@@ -14,6 +14,8 @@ final class VerificationCodeViewController: UIViewController, FlowController {
     
     //MARK: - Properties
     
+    var viewModel: VerificationCodeViewModel
+    
     //MARK: - Constants
     
     private enum Constants {
@@ -103,6 +105,19 @@ final class VerificationCodeViewController: UIViewController, FlowController {
         setupTapGesture()
         setupCodeInputCallbacks()
     }
+    
+    //MARK: - Init
+    
+    init(viewModel: VerificationCodeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - Deinit
     
     deinit {
         removeKeyboardObservers()

@@ -23,8 +23,8 @@ final class ModuleFactory {
         AuthViewController(viewModel: viewModel)
     }
 
-    func createEnterCodeModule() -> VerificationCodeViewController {
-        VerificationCodeViewController()
+    func createEnterCodeModule(with viewModel: VerificationCodeViewModel) -> VerificationCodeViewController {
+        VerificationCodeViewController(viewModel: viewModel)
     }
     
     func createProfileInfoModule() -> ProfileInfoViewController {
