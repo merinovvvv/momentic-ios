@@ -179,6 +179,11 @@ final class ProfileInfoViewController: UIViewController, FlowController {
         wrongNameLabel.text = message
         wrongNameLabel.isHidden = false
         
+        if !nameStack.arrangedSubviews.contains(where: { $0.subviews.contains(wrongNameLabel) }) {
+            let wrongNameLabelContainer = createLabelContainer(for: wrongNameLabel)
+            nameStack.addArrangedSubview(wrongNameLabelContainer)
+        }
+        
         nameTextField.layer.borderWidth = Constants.activeTextFieldBorderWidth
         nameTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
         nameTextField.attributedPlaceholder = NSAttributedString(
@@ -190,6 +195,11 @@ final class ProfileInfoViewController: UIViewController, FlowController {
     private func showSurnameError(_ message: String) {
         wrongSurnameLabel.text = message
         wrongSurnameLabel.isHidden = false
+        
+        if !surnameStack.arrangedSubviews.contains(where: { $0.subviews.contains(wrongSurnameLabel) }) {
+            let wrongSurnameLabelContainer = createLabelContainer(for: wrongSurnameLabel)
+            surnameStack.addArrangedSubview(wrongSurnameLabelContainer)
+        }
         
         surnameTextField.layer.borderWidth = Constants.activeTextFieldBorderWidth
         surnameTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
@@ -203,12 +213,15 @@ final class ProfileInfoViewController: UIViewController, FlowController {
         wrongBioLabel.text = message
         wrongBioLabel.isHidden = false
         
+        if !bioStack.arrangedSubviews.contains(where: { $0.subviews.contains(wrongBioLabel) }) {
+            let wrongBioLabelContainer = createLabelContainer(for: wrongBioLabel)
+            bioStack.addArrangedSubview(wrongBioLabelContainer)
+        }
+        
         bioTextView.layer.borderWidth = Constants.activeTextFieldBorderWidth
         bioTextView.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
-        //                bioTextView.attributedPlaceholder = NSAttributedString(
-        //                    string: bioTextView.placeholder ?? "",
-        //                    attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
-        //                )
+        bioTextView.textColor = UIColor(named: "wrongInput")
+        bioTextView.text = NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")
     }
 }
 
@@ -235,20 +248,14 @@ private extension ProfileInfoViewController {
         let nameLabelContainer = createLabelContainer(for: nameLabel)
         nameStack.addArrangedSubview(nameLabelContainer)
         nameStack.addArrangedSubview(nameTextField)
-        let wrongNameLabelContainer = createLabelContainer(for: wrongNameLabel)
-        nameStack.addArrangedSubview(wrongNameLabelContainer)
         
         let surnameLabelContainer = createLabelContainer(for: surnameLabel)
         surnameStack.addArrangedSubview(surnameLabelContainer)
         surnameStack.addArrangedSubview(surnameTextField)
-        let wrongSurnameLabelContainer = createLabelContainer(for: wrongSurnameLabel)
-        surnameStack.addArrangedSubview(wrongSurnameLabelContainer)
         
         let bioLabelContainer = createLabelContainer(for: bioLabel)
         bioStack.addArrangedSubview(bioLabelContainer)
         bioStack.addArrangedSubview(bioTextView)
-        let wrongBioLabelContainer = createLabelContainer(for: wrongBioLabel)
-        bioStack.addArrangedSubview(wrongBioLabelContainer)
     }
     
     func setupConstraints() {
@@ -335,12 +342,12 @@ private extension ProfileInfoViewController {
             )
         }
         
-        bioTextView.textColor = UIColor(named: "main")
+        bioTextView.textColor = UIColor(named: "subtitle")
+        bioTextView.text = NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")
         bioTextView.textAlignment = .left
         bioTextView.font = UIFont.systemFont(ofSize: Constants.textFieldFontSize, weight: .light)
         bioTextView.backgroundColor = UIColor(named: "backgroundGray")
         bioTextView.layer.cornerRadius = Constants.textFieldCornerRadius
-        bioTextView.placeholder = NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")
         bioTextView.delegate = self
         
         [nameStack, surnameStack, bioStack].forEach {
@@ -352,7 +359,7 @@ private extension ProfileInfoViewController {
         
         fullNameStack.axis = .horizontal
         fullNameStack.spacing = Constants.innerStackSpacing
-        fullNameStack.alignment = .fill
+        fullNameStack.alignment = .top
         fullNameStack.distribution = .fillEqually
         
         profileInfoStack.axis = .vertical
@@ -486,9 +493,9 @@ private extension ProfileInfoViewController {
 extension ProfileInfoViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
-        wrongNameLabel.isHidden = true
-        wrongSurnameLabel.isHidden = true
-        wrongBioLabel.isHidden = true
+        hideNameError()
+        hideSurnameError()
+        hideBioError()
         
         resetAllTextFieldsToNormalState()
         resetTextViewToNormalState()
@@ -519,9 +526,10 @@ extension ProfileInfoViewController: UITextFieldDelegate {
 extension ProfileInfoViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         
-        wrongBioLabel.isHidden = true
-        wrongNameLabel.isHidden = true
-        wrongSurnameLabel.isHidden = true
+        
+        hideNameError()
+        hideSurnameError()
+        hideBioError()
         
         resetTextViewToNormalState()
         resetAllTextFieldsToNormalState()
@@ -536,6 +544,40 @@ extension ProfileInfoViewController: UITextViewDelegate {
         textView.layer.borderColor = nil
         textView.layer.borderWidth = .zero
     }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+
+        let currentText: String = textView.text
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: text)
+
+        if updatedText.isEmpty {
+
+            textView.text = NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")
+            textView.textColor = UIColor(named: "subtitle")
+
+            textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.beginningOfDocument)
+        }
+
+         else if (textView.textColor == UIColor(named: "subtitle") || textView.textColor == UIColor(named: "wrongInput")) && !text.isEmpty {
+            textView.textColor = UIColor(named: "main")
+            textView.text = text
+        }
+        
+        else {
+            return true
+        }
+
+        return false
+    }
+    
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        if self.view.window != nil {
+            if textView.textColor == UIColor(named: "subtitle") ||
+                textView.textColor == UIColor(named: "wrongInput") {
+                textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.beginningOfDocument)
+            }
+        }
+    }
 }
 
 //MARK: - Helpers
@@ -546,7 +588,7 @@ private extension ProfileInfoViewController {
             textField.backgroundColor = UIColor(named: "backgroundGray")
             textField.layer.borderWidth = .zero
             textField.layer.borderColor = nil
-            textField.textColor = UIColor(named: "subtitle")
+            textField.textColor = UIColor(named: "main")
             
             textField.attributedPlaceholder = NSAttributedString(
                 string: textField.placeholder ?? "",
@@ -556,14 +598,33 @@ private extension ProfileInfoViewController {
     }
     
     private func resetTextViewToNormalState() {
+        bioTextView.textColor = UIColor(named: "subtitle")
         bioTextView.backgroundColor = UIColor(named: "backgroundGray")
         bioTextView.layer.borderWidth = .zero
         bioTextView.layer.borderColor = nil
-        bioTextView.textColor = UIColor(named: "subtitle")
-        
-//        bioTextView.attributedPlaceholder = NSAttributedString(
-//            string: textField.placeholder ?? "",
-//            attributes: [.foregroundColor: UIColor(named: "subtitle") ?? .black]
-//        )
+    }
+    
+    private func hideNameError() {
+        wrongNameLabel.isHidden = true
+        if let container = nameStack.arrangedSubviews.first(where: { $0.subviews.contains(wrongNameLabel) }) {
+            nameStack.removeArrangedSubview(container)
+            container.removeFromSuperview()
+        }
+    }
+
+    private func hideSurnameError() {
+        wrongSurnameLabel.isHidden = true
+        if let container = surnameStack.arrangedSubviews.first(where: { $0.subviews.contains(wrongSurnameLabel) }) {
+            surnameStack.removeArrangedSubview(container)
+            container.removeFromSuperview()
+        }
+    }
+
+    private func hideBioError() {
+        wrongBioLabel.isHidden = true
+        if let container = bioStack.arrangedSubviews.first(where: { $0.subviews.contains(wrongBioLabel) }) {
+            bioStack.removeArrangedSubview(container)
+            container.removeFromSuperview()
+        }
     }
 }
