@@ -137,6 +137,8 @@ private extension AuthViewController {
                     
                 case .invalidPassword:
                     strongSelf.showPasswordError(error.localizedDescription)
+                default:
+                    break
                 }
             }
         }
@@ -209,14 +211,16 @@ private extension AuthViewController {
         let emailLabelContainer = createLabelContainer(for: emailLabel)
         emailStack.addArrangedSubview(emailLabelContainer)
         emailStack.addArrangedSubview(emailTextField)
-        emailStack.addArrangedSubview(wrongEmailLabel)
+        let wrongEmailLabelContainer = createLabelContainer(for: wrongEmailLabel)
+        emailStack.addArrangedSubview(wrongEmailLabelContainer)
         
         authStack.addArrangedSubview(passwordStack)
         
         let passwordLabelContainer = createLabelContainer(for: passwordLabel)
         passwordStack.addArrangedSubview(passwordLabelContainer)
         passwordStack.addArrangedSubview(passwordTextField)
-        passwordStack.addArrangedSubview(wrongPasswordLabel)
+        let wrongPasswordLabelContainer = createLabelContainer(for: wrongPasswordLabel)
+        passwordStack.addArrangedSubview(wrongPasswordLabelContainer)
         
         contentView.addSubview(authButton)
     }

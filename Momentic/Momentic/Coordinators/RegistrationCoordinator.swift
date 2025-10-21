@@ -60,13 +60,12 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     private func showProfileInfoModule() {
-        let profileInfoViewController = moduleFactory.createProfileInfoModule()
         
-        profileInfoViewController.completionHandler = { [weak self] userInfo in
-//            self?.userData.name = userInfo[0]
-//            self?.userData.surname = userInfo[1]
-//            self?.userData.bio = userInfo[2]
-            
+        let profileInfoViewModel = ProfileInfoViewModel(networkHandler: .init())
+        
+        let profileInfoViewController = moduleFactory.createProfileInfoModule(with: profileInfoViewModel)
+        
+        profileInfoViewController.completionHandler = { [weak self] _ in
             self?.showAddPhotoModule()
         }
         

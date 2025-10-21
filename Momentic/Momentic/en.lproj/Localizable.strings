@@ -34,3 +34,7 @@
 "add_photo_title" = "Add photo";
 "add_photo_subtitle" = "Accounts with profile photo are more likely to be recognised by other users";
 "skip_this_step_button" = "Skip this step";
+
+"name_error_text" = "Your name cannot be empty";
+"surname_error_text" = "Your surname cannot be empty";
+"bio_error_text" = "Bio should be no longer than 500 symbols";

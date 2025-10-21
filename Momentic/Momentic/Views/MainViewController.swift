@@ -8,7 +8,9 @@
 import UIKit
 
 class MainViewController: UIViewController, FlowController {
-    var completionHandler: ((()) -> ())?
+    typealias T = Void
+    
+    var completionHandler: ((T) -> ())?
 
     override func viewDidLoad() {
         super.viewDidLoad()

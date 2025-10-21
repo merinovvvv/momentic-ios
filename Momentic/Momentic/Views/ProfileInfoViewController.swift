@@ -10,11 +10,13 @@ import UIKit
 final class ProfileInfoViewController: UIViewController, FlowController {
     
     //MARK: - FlowController
-    var completionHandler: (([String?]) -> ())?
+    typealias T = Void
+    var completionHandler: ((T) -> Void)?
     
     //MARK: - Properties
     
     private var activeTextField: UIView?
+    var viewModel: ProfileInfoViewModel
     
     //MARK: - Constants
     
@@ -58,6 +60,10 @@ final class ProfileInfoViewController: UIViewController, FlowController {
         
         static let contentOffsetWhenKeyboardShown: CGFloat = 20
         
+        static let activeTextFieldBorderWidth: CGFloat = 2
+        
+        static let wrongLabelFontSize: CGFloat = 12
+        
     }
     
     //MARK: - UI Properties
@@ -73,14 +79,17 @@ final class ProfileInfoViewController: UIViewController, FlowController {
     private let nameStack: UIStackView = UIStackView()
     private let nameLabel: UILabel = UILabel()
     private let nameTextField: UITextField = UITextField()
+    private let wrongNameLabel: UILabel = UILabel()
     
     private let surnameStack: UIStackView = UIStackView()
     private let surnameLabel: UILabel = UILabel()
     private let surnameTextField: UITextField = UITextField()
+    private let wrongSurnameLabel: UILabel = UILabel()
     
     private let bioStack: UIStackView = UIStackView()
     private let bioLabel: UILabel = UILabel()
     private let bioTextView: PaddedTextView = PaddedTextView()
+    private let wrongBioLabel: UILabel = UILabel()
     
     private let signUpButton: UIButton = UIButton(type: .system)
     
@@ -92,10 +101,114 @@ final class ProfileInfoViewController: UIViewController, FlowController {
         setupUI()
         setupKeyboardObservers()
         setupTapGesture()
+        setupBindings()
     }
+    
+    //MARK: - Init
+    init(viewModel: ProfileInfoViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - Deinit
     
     deinit {
         removeKeyboardObservers()
+    }
+    
+    //MARK: - Private Methods
+    
+    private func setupBindings() {
+        viewModel.onSuccess = { [weak self] in
+            self?.completionHandler?(())
+        }
+        
+        viewModel.onValidationErrors = { [weak self] errors in
+            guard let strongSelf = self else { return }
+            
+            [strongSelf.nameTextField, strongSelf.surnameTextField, strongSelf.bioTextView].forEach {
+                $0.resignFirstResponder()
+            }
+            
+            strongSelf.nameTextField.text = ""
+            strongSelf.surnameTextField.text = ""
+            strongSelf.bioTextView.text = ""
+            
+            errors.forEach { error in
+                switch error {
+                case .invalidName:
+                    strongSelf.showNameError(error.localizedDescription)
+                    
+                case .invalidSurname:
+                    strongSelf.showSurnameError(error.localizedDescription)
+                case .invalidBio:
+                    strongSelf.showBioError(error.localizedDescription)
+                default:
+                    break
+                }
+            }
+        }
+        
+        viewModel.onFailure = { [weak self] error in
+            guard let strongSelf = self else { return }
+            
+            [strongSelf.nameTextField, strongSelf.surnameTextField, strongSelf.bioTextView].forEach {
+                $0.resignFirstResponder()
+            }
+            
+            strongSelf.nameTextField.text = ""
+            strongSelf.surnameTextField.text = ""
+            strongSelf.bioTextView.text = ""
+            
+            strongSelf.showAlert(title: "Error", message: error.localizedDescription)
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        errorAlert.addAction(action)
+        present(errorAlert, animated: true)
+    }
+    
+    private func showNameError(_ message: String) {
+        wrongNameLabel.text = message
+        wrongNameLabel.isHidden = false
+        
+        nameTextField.layer.borderWidth = Constants.activeTextFieldBorderWidth
+        nameTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+        nameTextField.attributedPlaceholder = NSAttributedString(
+            string: nameTextField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+        )
+    }
+    
+    private func showSurnameError(_ message: String) {
+        wrongSurnameLabel.text = message
+        wrongSurnameLabel.isHidden = false
+        
+        surnameTextField.layer.borderWidth = Constants.activeTextFieldBorderWidth
+        surnameTextField.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+        surnameTextField.attributedPlaceholder = NSAttributedString(
+            string: surnameTextField.placeholder ?? "",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+        )
+    }
+    
+    private func showBioError(_ message: String) {
+        wrongBioLabel.text = message
+        wrongBioLabel.isHidden = false
+        
+        bioTextView.layer.borderWidth = Constants.activeTextFieldBorderWidth
+        bioTextView.layer.borderColor = UIColor(named: "wrongInput")?.cgColor
+        //                bioTextView.attributedPlaceholder = NSAttributedString(
+        //                    string: bioTextView.placeholder ?? "",
+        //                    attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "wrongInput") ?? .red]
+        //                )
     }
 }
 
@@ -122,14 +235,20 @@ private extension ProfileInfoViewController {
         let nameLabelContainer = createLabelContainer(for: nameLabel)
         nameStack.addArrangedSubview(nameLabelContainer)
         nameStack.addArrangedSubview(nameTextField)
+        let wrongNameLabelContainer = createLabelContainer(for: wrongNameLabel)
+        nameStack.addArrangedSubview(wrongNameLabelContainer)
         
         let surnameLabelContainer = createLabelContainer(for: surnameLabel)
         surnameStack.addArrangedSubview(surnameLabelContainer)
         surnameStack.addArrangedSubview(surnameTextField)
+        let wrongSurnameLabelContainer = createLabelContainer(for: wrongSurnameLabel)
+        surnameStack.addArrangedSubview(wrongSurnameLabelContainer)
         
         let bioLabelContainer = createLabelContainer(for: bioLabel)
         bioStack.addArrangedSubview(bioLabelContainer)
         bioStack.addArrangedSubview(bioTextView)
+        let wrongBioLabelContainer = createLabelContainer(for: wrongBioLabel)
+        bioStack.addArrangedSubview(wrongBioLabelContainer)
     }
     
     func setupConstraints() {
@@ -193,7 +312,7 @@ private extension ProfileInfoViewController {
         surnameTextField.placeholder = NSLocalizedString("surname_textfield_placeholder", comment: "Surame placeholder")
         nameTextField.delegate = self
         surnameTextField.delegate = self
-    
+        
         [nameTextField, surnameTextField].forEach {
             $0.textColor = UIColor(named: "main")
             $0.font = UIFont.systemFont(ofSize: Constants.textFieldFontSize, weight: .light)
@@ -248,6 +367,17 @@ private extension ProfileInfoViewController {
         signUpButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.signUpButtonTitleFontSize, weight: .medium)
         
         signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
+        
+        [wrongNameLabel, wrongSurnameLabel, wrongBioLabel].forEach {
+            $0.isHidden = true
+            $0.textColor = UIColor(named: "wrongInput")
+            $0.font = UIFont.systemFont(ofSize: Constants.wrongLabelFontSize, weight: .light)
+            $0.textAlignment = .left
+        }
+        
+        wrongNameLabel.text = NSLocalizedString("name_error_text", comment: "Invalid name")
+        wrongNameLabel.text = NSLocalizedString("surname_error_text", comment: "Invalid surname")
+        wrongNameLabel.text = NSLocalizedString("bio_error_text", comment: "Invalid bio")
     }
     
     func setupTapGesture() {
@@ -261,7 +391,7 @@ private extension ProfileInfoViewController {
 
 private extension ProfileInfoViewController {
     @objc func signUpButtonTapped() {
-        completionHandler?([nameTextField.text, surnameTextField.text, bioTextView.text])
+        viewModel.setInfo()
     }
 }
 
@@ -355,11 +485,24 @@ private extension ProfileInfoViewController {
 //MARK: - UITextFieldDelegate
 extension ProfileInfoViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+        wrongNameLabel.isHidden = true
+        wrongSurnameLabel.isHidden = true
+        wrongBioLabel.isHidden = true
+        
+        resetAllTextFieldsToNormalState()
+        resetTextViewToNormalState()
+        
         activeTextField = textField
+        activeTextField?.layer.borderColor = UIColor(named: "subtitle")?.cgColor
+        activeTextField?.layer.borderWidth = Constants.activeTextFieldBorderWidth
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
+        
         activeTextField = nil
+        textField.layer.borderColor = nil
+        textField.layer.borderWidth = .zero
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -375,10 +518,52 @@ extension ProfileInfoViewController: UITextFieldDelegate {
 //MARK: - UITextViewDelegate
 extension ProfileInfoViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
+        
+        wrongBioLabel.isHidden = true
+        wrongNameLabel.isHidden = true
+        wrongSurnameLabel.isHidden = true
+        
+        resetTextViewToNormalState()
+        resetAllTextFieldsToNormalState()
+        
         activeTextField = textView
+        activeTextField?.layer.borderColor = UIColor(named: "subtitle")?.cgColor
+        activeTextField?.layer.borderWidth = Constants.activeTextFieldBorderWidth
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         activeTextField = nil
+        textView.layer.borderColor = nil
+        textView.layer.borderWidth = .zero
+    }
+}
+
+//MARK: - Helpers
+
+private extension ProfileInfoViewController {
+    private func resetAllTextFieldsToNormalState() {
+        [nameTextField, surnameTextField].forEach { textField in
+            textField.backgroundColor = UIColor(named: "backgroundGray")
+            textField.layer.borderWidth = .zero
+            textField.layer.borderColor = nil
+            textField.textColor = UIColor(named: "subtitle")
+            
+            textField.attributedPlaceholder = NSAttributedString(
+                string: textField.placeholder ?? "",
+                attributes: [.foregroundColor: UIColor(named: "subtitle") ?? .black]
+            )
+        }
+    }
+    
+    private func resetTextViewToNormalState() {
+        bioTextView.backgroundColor = UIColor(named: "backgroundGray")
+        bioTextView.layer.borderWidth = .zero
+        bioTextView.layer.borderColor = nil
+        bioTextView.textColor = UIColor(named: "subtitle")
+        
+//        bioTextView.attributedPlaceholder = NSAttributedString(
+//            string: textField.placeholder ?? "",
+//            attributes: [.foregroundColor: UIColor(named: "subtitle") ?? .black]
+//        )
     }
 }

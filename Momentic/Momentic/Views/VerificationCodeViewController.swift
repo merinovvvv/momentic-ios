@@ -10,7 +10,8 @@ import UIKit
 final class VerificationCodeViewController: UIViewController, FlowController {
     
     //MARK: - FlowController
-    var completionHandler: ((()) -> ())?
+    typealias T = Void
+    var completionHandler: ((T) -> ())?
     
     //MARK: - Properties
     

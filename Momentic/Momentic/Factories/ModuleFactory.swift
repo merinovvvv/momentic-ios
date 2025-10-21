@@ -27,8 +27,8 @@ final class ModuleFactory {
         VerificationCodeViewController(viewModel: viewModel)
     }
     
-    func createProfileInfoModule() -> ProfileInfoViewController {
-        ProfileInfoViewController()
+    func createProfileInfoModule(with viewModel: ProfileInfoViewModel) -> ProfileInfoViewController {
+        ProfileInfoViewController(viewModel: viewModel)
     }
     
     func createAddPhotoModule() -> AddPhotoViewController {

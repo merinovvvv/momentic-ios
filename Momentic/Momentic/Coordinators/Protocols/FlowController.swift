@@ -7,6 +7,6 @@
 
 protocol FlowController {
     
-    associatedtype T
+    associatedtype T = Void
     var completionHandler: ((T) -> ())? { get set }
 }
