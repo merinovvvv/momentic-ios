@@ -150,12 +150,12 @@ private extension AddPhotoViewController {
         rightImageView.contentMode = .scaleAspectFit
         
         addPhotoLabel.text = NSLocalizedString("add_photo_title", comment: "Add photo")
-        addPhotoLabel.font = UIFont.systemFont(ofSize: Constants.addPhotoLabelFontSize, weight: .medium)
+        addPhotoLabel.font = .readexPro(size: Constants.addPhotoLabelFontSize, weight: .medium)
         addPhotoLabel.textColor = UIColor(named: "main")
         addPhotoLabel.textAlignment = .left
         
         explanationLabel.text = NSLocalizedString("add_photo_subtitle", comment: "Add photo")
-        explanationLabel.font = UIFont.systemFont(ofSize: Constants.explanationLabelFontSize, weight: .light)
+        explanationLabel.font = .readexPro(size: Constants.explanationLabelFontSize, weight: .light)
         explanationLabel.textColor = UIColor(named: "subtitle")
         explanationLabel.textAlignment = .left
         explanationLabel.numberOfLines = .zero
@@ -170,14 +170,14 @@ private extension AddPhotoViewController {
         addPhotoButton.backgroundColor = UIColor(named: "lightGreen")
         addPhotoButton.tintColor = .white
         addPhotoButton.layer.cornerRadius = Constants.addPhotoButtonCornerRadius
-        addPhotoButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.addPhotoButtonTextFontSize, weight: .medium)
+        addPhotoButton.titleLabel?.font = .readexPro(size: Constants.addPhotoButtonTextFontSize, weight: .medium)
         addPhotoButton.addTarget(self, action: #selector(addPhotoButtonTapped), for: .touchUpInside)
         
         skipThisStepButton.setTitle(NSLocalizedString("skip_this_step_button", comment: "Skip this step"), for: .normal)
         skipThisStepButton.setTitleColor(UIColor(named: "subtitle"), for: .normal)
         skipThisStepButton.backgroundColor = .clear
         skipThisStepButton.tintColor = UIColor(named: "subtitle")
-        skipThisStepButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.skipThisStepButtonTextFontSize, weight: .medium)
+        skipThisStepButton.titleLabel?.font = .readexPro(size: Constants.skipThisStepButtonTextFontSize, weight: .medium)
         skipThisStepButton.addTarget(self, action: #selector(skipThisStepButtonTapped), for: .touchUpInside)
     }
 }

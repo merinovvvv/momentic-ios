@@ -193,13 +193,13 @@ private extension VerificationCodeViewController {
         enterCodeLabel.text = NSLocalizedString("enter_code_text", comment: "Enter code")
         enterCodeLabel.textColor = UIColor(named: "main")
         enterCodeLabel.textAlignment = .left
-        enterCodeLabel.font = UIFont.systemFont(ofSize: Constants.enterCodeLabelFontSize, weight: .medium)
+        enterCodeLabel.font = .readexPro(size: Constants.enterCodeLabelFontSize, weight: .medium)
         
         explanationLabel.text = NSLocalizedString("enter_code_explanation_text", comment: "Enter code explanation text")
         explanationLabel.textColor = UIColor(named: "subtitle")
         explanationLabel.textAlignment = .left
         explanationLabel.numberOfLines = .zero
-        explanationLabel.font = UIFont.systemFont(ofSize: Constants.explanationLabelFontSize, weight: .light)
+        explanationLabel.font = .readexPro(size: Constants.explanationLabelFontSize, weight: .light)
         
         sendAgainButton.setTitle(NSLocalizedString("send_again_button_text", comment: "Send again"), for: .normal)
         sendAgainButton.backgroundColor = .clear

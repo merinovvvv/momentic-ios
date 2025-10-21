@@ -161,7 +161,7 @@ private extension CodeInputView {
     func createDigitLabel() -> UILabel {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = UIFont.systemFont(ofSize: Constants.digitLabelFontSize, weight: .medium)
+        label.font = .readexPro(size: Constants.digitLabelFontSize, weight: .medium)
         label.textColor = UIColor(named: "main")
         return label
     }

@@ -276,7 +276,7 @@ private extension AuthViewController {
         authButton.setTitle(viewModel.authText, for: .normal)
         
         authLabel.textColor = UIColor(named: "main")
-        authLabel.font = UIFont.systemFont(ofSize: Constants.authLabelFontSize, weight: .medium)
+        authLabel.font = .readexPro(size: Constants.authLabelFontSize, weight: .medium)
         
         authStack.axis = .vertical
         authStack.spacing = Constants.authStackSpacing
@@ -297,7 +297,7 @@ private extension AuthViewController {
         passwordLabel.text = NSLocalizedString("password_label_text", comment: "passwordLabel")
         
         [emailLabel, passwordLabel].forEach {
-            $0.font = UIFont.systemFont(ofSize: Constants.authInfoLabelFontSize, weight: .regular)
+            $0.font = .readexPro(size: Constants.authInfoLabelFontSize, weight: .regular)
             $0.textColor = UIColor(named: "main")
             $0.textAlignment = .left
         }
@@ -315,7 +315,7 @@ private extension AuthViewController {
         [emailTextField, passwordTextField].forEach {
             $0.backgroundColor = UIColor(named: "backgroundGray")
             $0.textColor = UIColor(named: "subtitle")
-            $0.font = UIFont.systemFont(ofSize: Constants.authTextFieldPlaceholderFontSize, weight: .light)
+            $0.font = .readexPro(size: Constants.authTextFieldPlaceholderFontSize, weight: .light)
             $0.layer.cornerRadius = Constants.authTextFieldCornerRadius
             $0.textAlignment = .left
             
@@ -349,7 +349,7 @@ private extension AuthViewController {
         [wrongEmailLabel, wrongPasswordLabel].forEach {
             $0.isHidden = true
             $0.textColor = UIColor(named: "wrongInput")
-            $0.font = UIFont.systemFont(ofSize: Constants.errorLabelFontSize, weight: .light)
+            $0.font = .readexPro(size: Constants.errorLabelFontSize, weight: .light)
         }
     }
     

@@ -162,12 +162,12 @@ private extension WelcomeViewController {
         rightImageView.contentMode = .scaleAspectFill
         
         welcomeTitleLabel.text = NSLocalizedString("welcome_title_text", comment: "Welcome message")
-        welcomeTitleLabel.font = .systemFont(ofSize: Constants.welcomeTitleLabelFontSize, weight: .medium)
+        welcomeTitleLabel.font = .readexPro(size: Constants.welcomeTitleLabelFontSize, weight: .medium)
         welcomeTitleLabel.textColor = .main
         welcomeTitleLabel.textAlignment = .center
         
         welcomeSubtitleLabel.text = NSLocalizedString("welcome_subtitle_text", comment: "Welcome Momentic text")
-        welcomeSubtitleLabel.font = .systemFont(ofSize: Constants.welcomeSubtitleLabelFontSize, weight: .light)
+        welcomeSubtitleLabel.font = .readexPro(size: Constants.welcomeSubtitleLabelFontSize, weight: .light)
         welcomeSubtitleLabel.textColor = UIColor(named: "subtitle")
         welcomeSubtitleLabel.textAlignment = .center
         welcomeSubtitleLabel.numberOfLines = .zero
@@ -177,7 +177,7 @@ private extension WelcomeViewController {
         signStack.spacing = Constants.signStackSpacing
         
         signUpButton.setTitle(NSLocalizedString("signup_button_text", comment: "Sign up"), for: .normal)
-        signUpButton.titleLabel?.font = .systemFont(ofSize: Constants.signUpButtonFontSize, weight: .medium)
+        signUpButton.titleLabel?.font = .readexPro(size: Constants.signUpButtonFontSize, weight: .medium)
         signUpButton.backgroundColor = UIColor(named: "main")
         signUpButton.layer.cornerRadius = Constants.signUpButtonCornerRadius
         signUpButton.tintColor = .white
@@ -185,7 +185,7 @@ private extension WelcomeViewController {
         signUpButton.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
         
         signInButton.setTitle(NSLocalizedString("signin_label_text", comment: "Sign in"), for: .normal)
-        signInButton.titleLabel?.font = .systemFont(ofSize: Constants.signInButtonFontSize, weight: .medium)
+        signInButton.titleLabel?.font = .readexPro(size: Constants.signInButtonFontSize, weight: .medium)
         signInButton.backgroundColor = .clear
         signInButton.tintColor = UIColor(named: "lightGreen")
         signInButton.addTarget(self, action: #selector(signInButtonTapped), for: .touchUpInside)

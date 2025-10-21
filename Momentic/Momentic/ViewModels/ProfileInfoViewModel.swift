@@ -97,7 +97,7 @@ final class ProfileInfoViewModel {
     }
     
     func isValidBio() -> Bool {
-        guard let bio, !bio.isEmpty, bio.count <= 500 else {
+        guard let bio, !bio.isEmpty && !(bio == NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")), bio.count <= 500 else {
             return false
         }
         
