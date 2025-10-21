@@ -398,6 +398,9 @@ private extension ProfileInfoViewController {
 
 private extension ProfileInfoViewController {
     @objc func signUpButtonTapped() {
+        viewModel.name = nameTextField.text
+        viewModel.surname = surnameTextField.text
+        viewModel.bio = bioTextView.text
         viewModel.setInfo()
     }
 }

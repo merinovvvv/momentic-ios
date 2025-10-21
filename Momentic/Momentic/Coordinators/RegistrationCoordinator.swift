@@ -75,8 +75,12 @@ final class RegistrationCoordinator: Coordinator {
     private func showAddPhotoModule() {
         let addPhotoViewController = moduleFactory.createAddPhotoModule()
         
-        addPhotoViewController.completionHandler = { [weak self] _ in
-            self?.showChoosePhotoModule()
+        addPhotoViewController.completionHandler = { [weak self] isAdding in
+            if isAdding {
+                self?.showChoosePhotoModule()
+            } else {
+                self?.flowCompletionHandler?()
+            }
         }
         
         navigationController.pushViewController(addPhotoViewController, animated: true)

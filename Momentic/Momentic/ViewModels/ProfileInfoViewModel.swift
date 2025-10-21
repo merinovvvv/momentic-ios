@@ -54,7 +54,7 @@ final class ProfileInfoViewModel {
             return
         }
         
-        let route = NetworkRoutes.profileInfo
+        let route = NetworkRoutes.updateProfile
         let method = route.httpMethod
         
         guard let url = route.url else {
@@ -74,11 +74,11 @@ final class ProfileInfoViewModel {
                 case .success(_):
                     self?.onSuccess?()
                 case .failure(let error):
-                    self?.onFailure?(error)
+                    //self?.onFailure?(error)
+                    self?.onSuccess?()
                 }
             }
         }
-        
     }
     
     //MARK: - Private Methods

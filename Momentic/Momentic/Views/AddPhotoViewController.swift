@@ -10,8 +10,7 @@ import UIKit
 final class AddPhotoViewController: UIViewController, FlowController {
     
     //MARK: - FlowController
-    typealias T = Void
-    var completionHandler: ((T) -> ())?
+    var completionHandler: ((Bool) -> ())?
     
     //MARK: - Properties
     
@@ -186,11 +185,11 @@ private extension AddPhotoViewController {
 //MARK: - Selectors
 private extension AddPhotoViewController {
     @objc func addPhotoButtonTapped() {
-        completionHandler?(())
+        completionHandler?(true)
     }
     
     @objc func skipThisStepButtonTapped() {
-        //TODO: - move to the end of the registration
+        completionHandler?(false)
     }
 }
 
