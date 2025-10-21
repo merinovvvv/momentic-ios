@@ -11,30 +11,35 @@ final class VerificationCodeViewModel {
     
     //MARK: - Properties
     
+    private let email: String
     private let networkHandler: NetworkHandler
+    private let tokenStorage: AccessTokenStorage
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler) {
+    init(email: String, networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+        self.email = email
         self.networkHandler = networkHandler
+        self.tokenStorage = tokenStorage
     }
     
     //MARK: - Closures
     
     var onVerificationSuccess: (() -> Void)?
-    var onVerificationFailure: ((String) -> Void)?
+    var onInvalidCode: ((String) -> Void)?
+    var onError: ((String) -> Void)?
     var onResendVerificationSuccess: (() -> Void)?
     var onResendVerificationFailure: ((String) -> Void)?
     
     //MARK: - Methods
     
-    func verifyCode(email: String, code: String) {
+    func verifyCode(code: String) {
         
         let route = NetworkRoutes.verify
         let method = route.httpMethod
         
         guard let url = route.url else {
-            onVerificationFailure?(ConfigurationError.nilObject.localizedDescription)
+            onError?(ConfigurationError.nilObject.localizedDescription)
             return
         }
         
@@ -46,28 +51,30 @@ final class VerificationCodeViewModel {
             jsonDictionary: jsonDictionary,
             httpMethod: method.rawValue
         ) { [weak self] result in
-            switch result {
-            case .success(let response):
-                if response.success {
-                    if let token = response.token {
-                        AccessTokenStorage().save(token)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    if response.success {
+                        if let token = response.token {
+                            self?.tokenStorage.save(token)
+                        }
+                        self?.onVerificationSuccess?()
+                    } else {
+                        self?.onInvalidCode?(response.message)
                     }
-                    self?.onVerificationSuccess?()
-                } else {
-                    self?.onVerificationFailure?(response.message)
+                case .failure(let error):
+                    self?.onError?(error.localizedDescription)
                 }
-            case .failure(let error):
-                self?.onVerificationFailure?(error.localizedDescription)
             }
         }
     }
     
-    func resendCode(email: String) {
+    func resendCode() {
         let route = NetworkRoutes.resendVerify
         let method = route.httpMethod
         
         guard let url = route.url else {
-            onVerificationFailure?(ConfigurationError.nilObject.localizedDescription)
+            onError?(ConfigurationError.nilObject.localizedDescription)
             return
         }
         
@@ -88,7 +95,7 @@ final class VerificationCodeViewModel {
                     self?.onResendVerificationFailure?(response.message)
                 }
             case .failure(let error):
-                self?.onVerificationFailure?(error.localizedDescription)
+                self?.onError?(error.localizedDescription)
             }
         }
     }

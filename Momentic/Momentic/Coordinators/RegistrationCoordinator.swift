@@ -27,11 +27,14 @@ final class RegistrationCoordinator: Coordinator {
         
         let registerViewModel = RegisterViewModel(networkHandler: .init())
         
-        registerViewModel.onSuccess = { [weak self] in
-            self?.showEnterCodeModule()
-        }
-        
         let registerViewController = moduleFactory.createRegisterModule(with: registerViewModel)
+        
+        registerViewModel.onSuccess = { [weak self] in
+            guard let email = registerViewController.viewModel.email else {
+                return
+            }
+            self?.showEnterCodeModule(email: email)
+        }
         
         registerViewController.completionHandler = { credentials in
             registerViewController.viewModel.email = credentials.email
@@ -43,9 +46,9 @@ final class RegistrationCoordinator: Coordinator {
         navigationController.pushViewController(registerViewController, animated: true)
     }
     
-    private func showEnterCodeModule() {
+    private func showEnterCodeModule(email: String) {
         
-        let verificationCodeViewModel = VerificationCodeViewModel(networkHandler: .init())
+        let verificationCodeViewModel = VerificationCodeViewModel(email: email, networkHandler: .init(), tokenStorage: .init())
         
         let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
         

@@ -66,33 +66,43 @@ final class VerificationCodeViewController: UIViewController, FlowController {
     
     private func setupCodeInputCallbacks() {
         codeInputView.onCodeComplete = { [weak self] code in
-            self?.verifyCode(code)
+            self?.viewModel.verifyCode(code: code)
         }
     }
     
-    private func verifyCode(_ code: String) {
+    private func setupBindings() {
+        viewModel.onVerificationSuccess = { [weak self] in
+            self?.codeInputView.showSuccess()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self?.completionHandler?(())
+            }
+        }
         
-        //TODO: - Replace with actual verification logic
+        viewModel.onInvalidCode = { [weak self] message in
+            self?.codeInputView.showError()
+        }
         
-        let isCorrect = code == "12345"
+        viewModel.onError = { [weak self] error in
+            self?.showAlert(title: "Error", message: error)
+        }
         
-        if isCorrect {
-            handleSuccess()
-        } else {
-            handleError()
+        //TODO: - Resend
+        
+        viewModel.onResendVerificationSuccess = { [weak self] in
+            
+        }
+        
+        viewModel.onResendVerificationFailure = { [weak self] error in
+            
         }
     }
     
-    private func handleSuccess() {
-        codeInputView.showSuccess()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.completionHandler?(())
-        }
-    }
-    
-    private func handleError() {
-        codeInputView.showError()
+    func showAlert(title: String, message: String) {
+        let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        errorAlert.addAction(action)
+        present(errorAlert, animated: true)
     }
     
     //MARK: - LifeCycle
@@ -104,6 +114,7 @@ final class VerificationCodeViewController: UIViewController, FlowController {
         setupKeyboardObservers()
         setupTapGesture()
         setupCodeInputCallbacks()
+        setupBindings()
     }
     
     //MARK: - Init
