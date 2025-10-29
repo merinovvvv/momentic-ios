@@ -10,7 +10,6 @@ import Foundation
 enum NetworkRoutes {
     
     private static let baseURL: String = "http://127.0.0.1:8080/api/"
-    //https://compounds-propecia-relax-terrorism.trycloudflare.com/api
     
     case register
     case login

@@ -9,4 +9,5 @@ struct UserInfo: Encodable {
     let name: String
     let surname: String
     let bio: String?
+    let token: String
 }

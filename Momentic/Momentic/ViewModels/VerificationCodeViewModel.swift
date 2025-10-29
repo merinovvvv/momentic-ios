@@ -12,13 +12,15 @@ final class VerificationCodeViewModel {
     //MARK: - Properties
     
     private let email: String
+    private let password: String
     private let networkHandler: NetworkHandler
     private let tokenStorage: AccessTokenStorage
     
     //MARK: - Init
     
-    init(email: String, networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+    init(email: String, password: String, networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
         self.email = email
+        self.password = password
         self.networkHandler = networkHandler
         self.tokenStorage = tokenStorage
     }
@@ -43,7 +45,7 @@ final class VerificationCodeViewModel {
             return
         }
         
-        let jsonDictionary = VerifyCodeRequest(email: email, code: code)
+        let jsonDictionary = VerifyCodeRequest(email: email, password: password, code: code)
         
         networkHandler.request(
             url,
@@ -63,8 +65,7 @@ final class VerificationCodeViewModel {
                         self?.onInvalidCode?(response.message)
                     }
                 case .failure(let error):
-                    //self?.onError?(error.localizedDescription)
-                    self?.onVerificationSuccess?()
+                    self?.onError?(error.localizedDescription)
                 }
             }
         }

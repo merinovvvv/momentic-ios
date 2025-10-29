@@ -7,5 +7,6 @@
 
 struct VerifyCodeRequest: Encodable {
     let email: String
+    let password: String
     let code: String
 }

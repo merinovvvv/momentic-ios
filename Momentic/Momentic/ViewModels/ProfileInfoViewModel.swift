@@ -12,11 +12,13 @@ final class ProfileInfoViewModel {
     //MARK: - Private properties
     
     private let networkHandler: NetworkHandler
+    private let tokenStorage: AccessTokenStorage
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler) {
+    init(networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
         self.networkHandler = networkHandler
+        self.tokenStorage = tokenStorage
     }
     
     //MARK: - Properties
@@ -62,7 +64,7 @@ final class ProfileInfoViewModel {
             return
         }
         
-        let jsonDictionary = UserInfo(name: name ?? "", surname: surname ?? "", bio: bio)
+        let jsonDictionary = UserInfo(name: name ?? "", surname: surname ?? "", bio: bio, token: tokenStorage.get()?.accessToken ?? "")
         
         networkHandler.request(
             url,
@@ -74,8 +76,7 @@ final class ProfileInfoViewModel {
                 case .success(_):
                     self?.onSuccess?()
                 case .failure(let error):
-                    //self?.onFailure?(error)
-                    self?.onSuccess?()
+                    self?.onFailure?(error)
                 }
             }
         }
