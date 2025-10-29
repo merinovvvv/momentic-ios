@@ -136,7 +136,11 @@ final class ProfileInfoViewController: UIViewController, FlowController {
             
             strongSelf.nameTextField.text = ""
             strongSelf.surnameTextField.text = ""
-            strongSelf.bioTextView.text = ""
+            strongSelf.bioTextView.text = NSLocalizedString("bio_textview_placeholder", comment: "Bio placeholder")
+            
+            if strongSelf.wrongBioLabel.isHidden {
+                strongSelf.resetTextViewToNormalState()
+            }
             
             errors.forEach { error in
                 switch error {

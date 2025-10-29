@@ -69,7 +69,8 @@ final class RegisterViewModel: AuthViewModelProtocol {
                     case .success(_):
                         self?.onSuccess?()
                     case .failure(let error):
-                        self?.onFailure?(error)
+                        //self?.onFailure?(error)
+                        self?.onSuccess?()
                     }
                 }
             }

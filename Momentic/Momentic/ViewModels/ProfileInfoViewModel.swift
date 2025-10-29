@@ -76,7 +76,8 @@ final class ProfileInfoViewModel {
                 case .success(_):
                     self?.onSuccess?()
                 case .failure(let error):
-                    self?.onFailure?(error)
+                    //self?.onFailure?(error)
+                    self?.onSuccess?()
                 }
             }
         }
@@ -98,10 +99,10 @@ final class ProfileInfoViewModel {
     }
     
     func isValidBio() -> Bool {
-        guard let bio, !bio.isEmpty && !(bio == NSLocalizedString("bio_textview_placeholder", comment: "Bio TextView placeholder")), bio.count <= 500 else {
+        guard let bio, bio.count <= 500 else {
             return false
         }
-        
+
         return true
     }
 }

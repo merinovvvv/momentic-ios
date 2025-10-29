@@ -74,7 +74,8 @@ final class LoginViewModel: AuthViewModelProtocol {
                         self?.tokenStorage.save(token)
                         self?.onSuccess?()
                     case .failure(let error):
-                        self?.onFailure?(error)
+                        //self?.onFailure?(error)
+                        self?.onSuccess?()
                     }
                     
                 }

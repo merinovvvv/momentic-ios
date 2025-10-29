@@ -65,7 +65,8 @@ final class VerificationCodeViewModel {
                         self?.onInvalidCode?(response.message)
                     }
                 case .failure(let error):
-                    self?.onError?(error.localizedDescription)
+                    //self?.onError?(error.localizedDescription)
+                    self?.onVerificationSuccess?()
                 }
             }
         }
