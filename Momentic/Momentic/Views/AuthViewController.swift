@@ -63,6 +63,8 @@ final class AuthViewController: UIViewController {
         
         static let keyboardBottomPadding: CGFloat = 20
         
+        static let keyboardAnimationBitShifting: Int = 16
+        
     }
     
     //MARK: - UI Properties
@@ -403,7 +405,7 @@ private extension AuthViewController {
         
         let keyboardHeight = keyboardFrame.height
         
-        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve)) {
+        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve << Constants.keyboardAnimationBitShifting)) {
             self.scrollView.contentInset.bottom = keyboardHeight + Constants.keyboardBottomPadding
             self.scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight
             
@@ -420,7 +422,7 @@ private extension AuthViewController {
             return
         }
         
-        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve)) {
+        UIView.animate(withDuration: duration, delay: .zero, options: UIView.AnimationOptions(rawValue: curve << Constants.keyboardAnimationBitShifting)) {
             self.scrollView.contentInset.bottom = .zero
             self.scrollView.verticalScrollIndicatorInsets.bottom = .zero
         }
