@@ -38,3 +38,28 @@
 "name_error_text" = "Your name cannot be empty";
 "surname_error_text" = "Your surname cannot be empty";
 "bio_error_text" = "Bio should be no longer than 500 symbols";
+
+"add_photo_title" = "Add photo";
+"add_photo_subtitle" = "Add a profile photo to personalize your account";
+"skip_this_step_button" = "Skip this step";
+
+"choose_photo_source" = "Choose Photo Source";
+"take_photo" = "Take Photo";
+"choose_from_gallery" = "Choose from Gallery";
+
+"camera_permission_denied" = "Camera Access Denied";
+"camera_permission_denied_message" = "Please enable camera access in Settings to take photos";
+"photo_permission_denied" = "Photo Library Access Denied";
+"photo_permission_denied_message" = "Please enable photo library access in Settings to choose photos";
+
+"camera_not_available" = "Camera Not Available";
+"camera_not_available_message" = "Camera is not available on this device";
+
+"photo_compression_failed" = "Failed to compress photo";
+"photo_save_failed" = "Failed to save photo";
+"invalid_image" = "Invalid image selected";
+
+"error" = "Error";
+"ok" = "OK";
+"cancel" = "Cancel";
+"settings" = "Settings";

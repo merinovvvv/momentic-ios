@@ -31,8 +31,12 @@ final class ModuleFactory {
         ProfileInfoViewController(viewModel: viewModel)
     }
     
-    func createAddPhotoModule() -> AddPhotoViewController {
-        AddPhotoViewController()
+    func createAddPhotoModule(with viewModel: AddPhotoViewModel) -> AddPhotoViewController {
+        AddPhotoViewController(viewModel: viewModel)
+    }
+    
+    func createChoosePhotoModule() -> ChoosePhotoViewController {
+        ChoosePhotoViewController()
     }
     
     func createMainModule() -> MainViewController {

@@ -14,6 +14,8 @@ final class AddPhotoViewController: UIViewController, FlowController {
     
     //MARK: - Properties
     
+    private var viewModel: AddPhotoViewModel
+    
     //MARK: - Constants
     
     private enum Constants {
@@ -80,6 +82,18 @@ final class AddPhotoViewController: UIViewController, FlowController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
+        setupViewModelBindings()
+    }
+    
+    //MARK: - Init
+    
+    init(viewModel: AddPhotoViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -182,6 +196,27 @@ private extension AddPhotoViewController {
     }
 }
 
+//MARK: - Setup Bindings
+private extension AddPhotoViewController {
+    func setupViewModelBindings() {
+        viewModel.onPhotoSaved = { [weak self] url in
+            self?.completionHandler?(false)
+        }
+        
+        viewModel.onError = { [weak self] error in
+            self?.showErrorAlert(error)
+        }
+    }
+}
+
+//MARK: - Public Methods
+extension AddPhotoViewController {
+    func handleSelectedPhoto(_ image: UIImage) {
+        viewModel.setSelectedImage(image)
+        viewModel.savePhoto(image)
+    }
+}
+
 //MARK: - Selectors
 private extension AddPhotoViewController {
     @objc func addPhotoButtonTapped() {
@@ -193,3 +228,15 @@ private extension AddPhotoViewController {
     }
 }
 
+//MARK: - Helper Methods
+private extension AddPhotoViewController {
+    func showErrorAlert(_ error: Error) {
+        let alert = UIAlertController(
+            title: NSLocalizedString("error", comment: "Error"),
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: "OK"), style: .default))
+        present(alert, animated: true)
+    }
+}

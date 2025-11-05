@@ -31,7 +31,7 @@ final class RegistrationCoordinator: Coordinator {
         
         registerViewModel.onSuccess = { [weak self] in
             guard let email = registerViewController.viewModel.email,
-            let password = registerViewController.viewModel.password else {
+                  let password = registerViewController.viewModel.password else {
                 return
             }
             self?.showEnterCodeModule(email: email, password: password)
@@ -40,7 +40,7 @@ final class RegistrationCoordinator: Coordinator {
         registerViewController.completionHandler = { credentials in
             registerViewController.viewModel.email = credentials.email
             registerViewController.viewModel.password = credentials.password
-        
+            
             registerViewModel.submit()
         }
         
@@ -74,11 +74,12 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     private func showAddPhotoModule() {
-        let addPhotoViewController = moduleFactory.createAddPhotoModule()
+        let addPhotoViewModel = AddPhotoViewModel()
+        let addPhotoViewController = moduleFactory.createAddPhotoModule(with: addPhotoViewModel)
         
-        addPhotoViewController.completionHandler = { [weak self] isAdding in
-            if isAdding {
-                self?.showChoosePhotoModule()
+        addPhotoViewController.completionHandler = { [weak self] shouldAddPhoto in
+            if shouldAddPhoto {
+                self?.showChoosePhotoModule(addPhotoViewController: addPhotoViewController)
             } else {
                 self?.flowCompletionHandler?()
             }
@@ -87,7 +88,19 @@ final class RegistrationCoordinator: Coordinator {
         navigationController.pushViewController(addPhotoViewController, animated: true)
     }
     
-    private func showChoosePhotoModule() {
-        //TODO: - showChoosePhotoModule
+    private func showChoosePhotoModule(addPhotoViewController: AddPhotoViewController) {
+        let choosePhotoViewController = moduleFactory.createChoosePhotoModule()
+        
+        choosePhotoViewController.completionHandler = { [weak self] result in
+            switch result {
+            case .success(let image):
+                addPhotoViewController.handleSelectedPhoto(image)
+            case .failure(let error):
+                print("Photo selection error: \(error.localizedDescription)")
+                self?.flowCompletionHandler?()
+            }
+        }
+        choosePhotoViewController.modalPresentationStyle = .fullScreen
+        navigationController.present(choosePhotoViewController, animated: true)
     }
 }
