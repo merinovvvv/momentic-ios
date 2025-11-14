@@ -7,7 +7,6 @@
 
 import UIKit
 import PhotosUI
-import AVFoundation
 
 final class ChoosePhotoViewController: UIViewController {
     
@@ -32,14 +31,13 @@ final class ChoosePhotoViewController: UIViewController {
         static let titleLabelTopSpacing: CGFloat = 16
         
         static let imageViewTopSpacing: CGFloat = 153
-        //static let imageViewBottomSpacing: CGFloat = 258
-        static let imageViewCornerRadius: CGFloat = 24
         
         //MARK: - Values
         
         static let titleLabelFontSize: CGFloat = 26
         static let backButtonIconSize: CGFloat = 32
         static let checkmarkButtonIconSize: CGFloat = 32
+        static let overlayAlpha: CGFloat = 0.65
     }
     
     //MARK: - UI Properties
@@ -48,6 +46,7 @@ final class ChoosePhotoViewController: UIViewController {
     private let checkmarkButton: UIButton = UIButton(type: .system)
     private let titleLabel: UILabel = UILabel()
     private let photoImageView: UIImageView = UIImageView()
+    private let overlayView: UIView = UIView()
     
     //MARK: - LifeCycle
     
@@ -63,6 +62,11 @@ final class ChoosePhotoViewController: UIViewController {
             self?.openPhotoPicker()
         }
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateCircularMask()
+    }
 }
 
 //MARK: - Setup UI
@@ -74,13 +78,13 @@ private extension ChoosePhotoViewController {
     }
     
     func setupViewHierarchy() {
-        [backButton, checkmarkButton, titleLabel, photoImageView].forEach {
+        [backButton, checkmarkButton, titleLabel, photoImageView, overlayView].forEach {
             view.addSubview($0)
         }
     }
     
     func setupConstraints() {
-        [backButton, checkmarkButton, titleLabel, photoImageView].forEach {
+        [backButton, checkmarkButton, titleLabel, photoImageView, overlayView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -102,6 +106,11 @@ private extension ChoosePhotoViewController {
             photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             photoImageView.heightAnchor.constraint(equalTo: photoImageView.widthAnchor),
+            
+            overlayView.topAnchor.constraint(equalTo: photoImageView.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: photoImageView.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: photoImageView.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: photoImageView.bottomAnchor),
         ])
     }
     
@@ -114,7 +123,6 @@ private extension ChoosePhotoViewController {
         checkmarkButton.tintColor = UIColor(named: "lightGreen")
         checkmarkButton.addTarget(self, action: #selector(checkmarkButtonTapped), for: .touchUpInside)
         checkmarkButton.isEnabled = false
-        //checkmarkButton.alpha = 0.5
         
         titleLabel.text = NSLocalizedString("add_photo_title", comment: "Add photo")
         titleLabel.font = .readexPro(size: Constants.titleLabelFontSize, weight: .medium)
@@ -123,8 +131,36 @@ private extension ChoosePhotoViewController {
         
         photoImageView.contentMode = .scaleAspectFill
         photoImageView.clipsToBounds = true
-        photoImageView.layer.cornerRadius = Constants.imageViewCornerRadius
         photoImageView.backgroundColor = .clear
+        
+        overlayView.backgroundColor = UIColor(named: "pickerGray")?.withAlphaComponent(Constants.overlayAlpha)
+        overlayView.isUserInteractionEnabled = false
+        overlayView.isHidden = true
+    }
+    
+    func updateCircularMask() {
+        guard !overlayView.isHidden else { return }
+        
+        let maskLayer = CAShapeLayer()
+        let bounds = overlayView.bounds
+        let circlePath = UIBezierPath(rect: bounds)
+        
+        let circleSize = min(bounds.width, bounds.height)
+        let circleRect = CGRect(
+            x: (bounds.width - circleSize) / 2,
+            y: (bounds.height - circleSize) / 2,
+            width: circleSize,
+            height: circleSize
+        )
+        let circleCutout = UIBezierPath(ovalIn: circleRect)
+        
+        circlePath.append(circleCutout)
+        circlePath.usesEvenOddFillRule = true
+        
+        maskLayer.path = circlePath.cgPath
+        maskLayer.fillRule = .evenOdd
+        
+        overlayView.layer.mask = maskLayer
     }
 }
 
@@ -136,8 +172,41 @@ private extension ChoosePhotoViewController {
     
     @objc func checkmarkButtonTapped() {
         guard let image = photoImageView.image else { return }
-        completionHandler?(.success(image))
+        
+        let croppedImage = cropToCircle(image: image)
+        completionHandler?(.success(croppedImage))
         dismiss(animated: true)
+    }
+    
+    func cropToCircle(image: UIImage) -> UIImage {
+        let imageSize = image.size
+        let diameter = min(imageSize.width, imageSize.height)
+        let isLandscape = imageSize.width > imageSize.height
+        
+        let xOffset = isLandscape ? (imageSize.width - diameter) / 2 : 0
+        let yOffset = isLandscape ? 0 : (imageSize.height - diameter) / 2
+        
+        let imageRef = image.cgImage!.cropping(to: CGRect(x: xOffset * image.scale,
+                                                           y: yOffset * image.scale,
+                                                           width: diameter * image.scale,
+                                                           height: diameter * image.scale))
+        
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        format.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: diameter, height: diameter), format: format)
+        
+        let circularImage = renderer.image { context in
+            let rect = CGRect(x: 0, y: 0, width: diameter, height: diameter)
+            UIBezierPath(ovalIn: rect).addClip()
+            
+            if let imageRef = imageRef {
+                UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation).draw(in: rect)
+            }
+        }
+        
+        return circularImage
     }
 }
 
@@ -295,9 +364,12 @@ extension ChoosePhotoViewController: PHPickerViewControllerDelegate {
 private extension ChoosePhotoViewController {
     func displaySelectedPhoto(_ image: UIImage) {
         photoImageView.image = image
-        photoImageView.backgroundColor = UIColor(named: "pickerGray")
-        photoImageView.alpha = 0.65
+        overlayView.isHidden = false
         checkmarkButton.isEnabled = true
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.updateCircularMask()
+        }
     }
 }
 
