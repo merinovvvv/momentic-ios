@@ -55,9 +55,13 @@
 "camera_not_available" = "Камера недоступна";
 "camera_not_available_message" = "Камера недоступна на этом устройстве";
 
-"photo_compression_failed" = "Не удалось сжать фотографию";
-"photo_save_failed" = "Не удалось сохранить фотографию";
-"invalid_image" = "Выбрано недопустимое изображение";
+"photo_compression_failed" = "Не удалось сжать фото";
+"photo_upload_failed" = "Не удалось загрузить фото. Код ошибки: %d";
+"invalid_image" = "Неверное изображение";
+"invalid_url" = "Неверный URL";
+"invalid_response" = "Неверный ответ сервера";
+"unauthorized" = "Не авторизован. Пожалуйста, войдите снова";
+"file_too_large" = "Файл слишком большой";
 
 "error" = "Ошибка";
 "ok" = "ОК";
