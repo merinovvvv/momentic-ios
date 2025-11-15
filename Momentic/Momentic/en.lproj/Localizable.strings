@@ -1,0 +1,65 @@
+/*
+  Localizable.strings
+  Momentic
+
+  Created by Yaraslau Merynau on 25.09.25.
+  
+*/
+
+"welcome_title_text" = "Welcome";
+"welcome_subtitle_text" = "Drive into varieties of joyful stories with Momentic. Each moment is unique.";
+"signup_button_text" = "Sign up";
+"signin_label_text" = "Already have an account?";
+"signin_button_text" = "Sign in";
+
+"email_label_text" = "University e-mail";
+"email_textfield_placeholder" = "Mail given you by the uni";
+"password_label_text" = "Password";
+"password_textfield_placeholder" = "Input your password here";
+"email_error_text" = "Mail should be written in format: faculty.surname@bsu.by";
+"password_error_text" = "Password should include lower and upper case plus numbers";
+
+"enter_code_text" = "Enter code";
+"enter_code_explanation_text" = "5-digit verification code has been sent to your mail";
+"send_again_button_text" = "Send again";
+
+"profile_info_label" = "Profile info";
+"name_label" = "Name";
+"name_textfield_placeholder" = "John";
+"surname_label" = "Surname";
+"surname_textfield_placeholder" = "Johnson";
+"bio_label" = "Bio";
+"bio_textview_placeholder" = "ex. FAMCS BSU Informatics student";
+
+"add_photo_title" = "Add photo";
+"add_photo_subtitle" = "Accounts with profile photo are more likely to be recognised by other users";
+"skip_this_step_button" = "Skip this step";
+
+"name_error_text" = "Your name cannot be empty";
+"surname_error_text" = "Your surname cannot be empty";
+"bio_error_text" = "Bio should be no longer than 500 symbols";
+
+"add_photo_title" = "Add photo";
+"add_photo_subtitle" = "Add a profile photo to personalize your account";
+"skip_this_step_button" = "Skip this step";
+
+"choose_photo_source" = "Choose Photo Source";
+"take_photo" = "Take Photo";
+"choose_from_gallery" = "Choose from Gallery";
+
+"camera_permission_denied" = "Camera Access Denied";
+"camera_permission_denied_message" = "Please enable camera access in Settings to take photos";
+"photo_permission_denied" = "Photo Library Access Denied";
+"photo_permission_denied_message" = "Please enable photo library access in Settings to choose photos";
+
+"camera_not_available" = "Camera Not Available";
+"camera_not_available_message" = "Camera is not available on this device";
+
+"photo_compression_failed" = "Failed to compress photo";
+"photo_save_failed" = "Failed to save photo";
+"invalid_image" = "Invalid image selected";
+
+"error" = "Error";
+"ok" = "OK";
+"cancel" = "Cancel";
+"settings" = "Settings";
