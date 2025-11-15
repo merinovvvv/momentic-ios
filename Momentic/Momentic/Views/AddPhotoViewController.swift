@@ -199,7 +199,7 @@ private extension AddPhotoViewController {
 //MARK: - Setup Bindings
 private extension AddPhotoViewController {
     func setupViewModelBindings() {
-        viewModel.onPhotoSaved = { [weak self] url in
+        viewModel.onPhotoSaved = { [weak self] in
             self?.completionHandler?(false)
         }
         

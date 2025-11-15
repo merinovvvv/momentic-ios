@@ -74,7 +74,7 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     private func showAddPhotoModule() {
-        let addPhotoViewModel = AddPhotoViewModel()
+        let addPhotoViewModel = AddPhotoViewModel(networkHandler: .init(), tokenStorage: .init())
         let addPhotoViewController = moduleFactory.createAddPhotoModule(with: addPhotoViewModel)
         
         addPhotoViewController.completionHandler = { [weak self] shouldAddPhoto in

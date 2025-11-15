@@ -19,6 +19,7 @@ enum HTTPMethod: String{
 //MARK: - ContentType
 enum ContentType: String{
     case json = "application/json; charset=utf-8"
+    case jpeg = "image/jpeg"
 }
 
 //MARK: - NetworkHandler
@@ -114,6 +115,65 @@ final class NetworkHandler {
                 completion(.failure(error))
             }
         }
+    }
+    
+    func uploadData(
+        _ url: URL,
+        data: Data,
+        httpMethod: String = HTTPMethod.put.rawValue,
+        contentType: String,
+        accessToken: String? = nil,
+        completion: @escaping (Result<Data, Error>) -> Void
+    ) {
+        var urlRequest = makeURLRequest(
+            with: url,
+            httpMethod: httpMethod,
+            contentType: contentType,
+            accessToken: accessToken
+        )
+        
+        urlRequest.httpBody = data
+        
+        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            guard let data else {
+                if let error {
+                    let nsError = error as NSError
+                    
+                    switch nsError.code {
+                    case NSURLErrorNotConnectedToInternet,
+                    NSURLErrorNetworkConnectionLost:
+                        completion(.failure(NetworkError.noResponse))
+                        
+                    case NSURLErrorTimedOut:
+                        completion(.failure(NetworkError.dataError("Request timed out")))
+                        
+                    case NSURLErrorCannotConnectToHost:
+                        completion(.failure(NetworkError.dataError("Cannot connect to server")))
+                        
+                    default:
+                        completion(.failure(NetworkError.dataError(error.localizedDescription)))
+                    }
+                    return
+                }
+                completion(.failure(NetworkError.dataError("No data")))
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Could not create HTTPURLResponse for: \(urlRequest.url?.absoluteString ?? "")")
+                completion(.failure(NetworkError.noResponse))
+                return
+            }
+            
+            let statusCode = httpResponse.statusCode
+            
+            guard (200..<300).contains(statusCode) else {
+                completion(.failure(NetworkError.failedStatusCodeResponseData(statusCode, data)))
+                return
+            }
+            
+            completion(.success(data))
+        }.resume()
     }
 }
 

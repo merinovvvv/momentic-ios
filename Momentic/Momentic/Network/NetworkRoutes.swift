@@ -16,6 +16,7 @@ enum NetworkRoutes {
     case verify
     case resendVerify
     case updateProfile
+    case updateAvatar
     
     var url: URL? {
         var path: String
@@ -30,6 +31,8 @@ enum NetworkRoutes {
             path = NetworkRoutes.baseURL + "auth/resend-verify-code/"
         case .updateProfile:
             path = NetworkRoutes.baseURL + "user/profile/"
+        case .updateAvatar:
+            path = NetworkRoutes.baseURL + "user/avatar/"
         }
         
         return URL(string: path)
@@ -39,7 +42,7 @@ enum NetworkRoutes {
         switch self {
             
         case .register, .login, .verify, .resendVerify: .post
-        case .updateProfile: .patch
+        case .updateProfile, .updateAvatar: .patch
             
         }
     }

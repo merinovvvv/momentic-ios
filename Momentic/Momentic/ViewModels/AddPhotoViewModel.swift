@@ -12,11 +12,20 @@ final class AddPhotoViewModel {
     //MARK: - Properties
     
     private(set) var selectedImage: UIImage?
+    private let networkHandler: NetworkHandler
+    private let tokenStorage: AccessTokenStorage
     
     //MARK: - Closures
     
-    var onPhotoSaved: ((URL) -> Void)?
+    var onPhotoSaved: (() -> Void)?
     var onError: ((Error) -> Void)?
+    
+    //MARK: - Init
+    
+    init(networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+        self.networkHandler = networkHandler
+        self.tokenStorage = tokenStorage
+    }
     
     //MARK: - Public Methods
     
@@ -25,39 +34,54 @@ final class AddPhotoViewModel {
     }
     
     func savePhoto(_ image: UIImage) {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            do {
-                let url = try self?.saveImageToDocuments(image)
-                DispatchQueue.main.async {
-                    if let url = url {
-                        self?.onPhotoSaved?(url)
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                guard let self = self else { return }
+                
+                do {
+                    guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+                        throw PhotoError.compressionFailed
                     }
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self?.onError?(error)
+                    
+                    self.uploadPhoto(imageData: imageData)
+                } catch {
+                    DispatchQueue.main.async {
+                        self.onError?(error)
+                    }
                 }
             }
         }
-    }
     
     func clearSelectedPhoto() {
         selectedImage = nil
     }
     
-    //MARK: - Private Methods
-    
-    private func saveImageToDocuments(_ image: UIImage) throws -> URL {
-        guard let data = image.jpegData(compressionQuality: 0.8) else {
-            throw PhotoError.compressionFailed
+    private func uploadPhoto(imageData: Data) {
+        
+        let route = NetworkRoutes.updateAvatar
+        let method = route.httpMethod
+        
+        guard let url = route.url else {
+            onError?(ConfigurationError.nilObject)
+            return
         }
         
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileName = "profile_photo_\(UUID().uuidString).jpg"
-        let fileURL = documentsDirectory.appendingPathComponent(fileName)
-        
-        try data.write(to: fileURL)
-        return fileURL
+        networkHandler.uploadData(
+            url,
+            data: imageData,
+            httpMethod: method.rawValue,
+            contentType: ContentType.jpeg.rawValue,
+            accessToken: tokenStorage.get()?.accessToken
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.onPhotoSaved?()
+                case .failure(let error):
+                    //self?.onError?(error)
+                    self?.onPhotoSaved?()
+                }
+            }
+        }
     }
 }
 
