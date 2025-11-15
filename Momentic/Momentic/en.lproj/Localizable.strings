@@ -56,8 +56,12 @@
 "camera_not_available_message" = "Camera is not available on this device";
 
 "photo_compression_failed" = "Failed to compress photo";
-"photo_save_failed" = "Failed to save photo";
-"invalid_image" = "Invalid image selected";
+"photo_upload_failed" = "Failed to upload photo. Status code: %d";
+"invalid_image" = "Invalid image";
+"invalid_url" = "Invalid URL";
+"invalid_response" = "Invalid server response";
+"unauthorized" = "Unauthorized. Please log in again";
+"file_too_large" = "File is too large";
 
 "error" = "Error";
 "ok" = "OK";

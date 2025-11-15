@@ -15,6 +15,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Views/ProfileInfoViewController.swift,
+				Views/VerificationCodeViewController.swift,
+				Views/WelcomeViewController.swift,
 			);
 			target = 5AD8B9312E856EBE00779C1C /* Momentic */;
 		};
