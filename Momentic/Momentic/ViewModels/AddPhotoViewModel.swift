@@ -12,8 +12,8 @@ final class AddPhotoViewModel {
     //MARK: - Properties
     
     private(set) var selectedImage: UIImage?
-    private let networkHandler: NetworkHandler
-    private let tokenStorage: AccessTokenStorage
+    private let networkHandler: NetworkHandlerProtocol
+    private let tokenStorage: AccessTokenStorageProtocol
     
     //MARK: - Closures
     
@@ -22,7 +22,7 @@ final class AddPhotoViewModel {
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+    init(networkHandler: NetworkHandlerProtocol, tokenStorage: AccessTokenStorageProtocol) {
         self.networkHandler = networkHandler
         self.tokenStorage = tokenStorage
     }
@@ -42,8 +42,19 @@ final class AddPhotoViewModel {
                         throw PhotoError.compressionFailed
                     }
                     
+                    LoggingService.shared.info(
+                        "Photo compression successful",
+                        category: "Photo",
+                        metadata: ["size_bytes": String(imageData.count)]
+                    )
+                    
                     self.uploadPhoto(imageData: imageData)
                 } catch {
+                    LoggingService.shared.logError(
+                        error,
+                        category: "Photo",
+                        additionalMetadata: ["action": "compress"]
+                    )
                     DispatchQueue.main.async {
                         self.onError?(error)
                     }
@@ -61,9 +72,20 @@ final class AddPhotoViewModel {
         let method = route.httpMethod
         
         guard let url = route.url else {
+            LoggingService.shared.error(
+                "Photo upload URL not found",
+                category: "Photo",
+                metadata: ["route": "updateAvatar"]
+            )
             onError?(ConfigurationError.nilObject)
             return
         }
+        
+        LoggingService.shared.info(
+            "Photo upload started",
+            category: "Photo",
+            metadata: ["size_bytes": String(imageData.count)]
+        )
         
         networkHandler.uploadData(
             url,
@@ -75,8 +97,14 @@ final class AddPhotoViewModel {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
+                    LoggingService.shared.info("Photo upload successful", category: "Photo")
                     self?.onPhotoSaved?()
                 case .failure(let error):
+                    LoggingService.shared.logError(
+                        error,
+                        category: "Photo",
+                        additionalMetadata: ["action": "upload"]
+                    )
                     //self?.onError?(error)
                     self?.onPhotoSaved?()
                 }

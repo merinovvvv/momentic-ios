@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		5AF485512EF8205F0022B724 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5AD8B92A2E856EBE00779C1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AD8B9312E856EBE00779C1C;
+			remoteInfo = Momentic;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		5AD8B9322E856EBE00779C1C /* Momentic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Momentic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AF4854D2EF8205F0022B724 /* MomenticTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MomenticTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -32,10 +43,22 @@
 			path = Momentic;
 			sourceTree = "<group>";
 		};
+		5AF4854E2EF8205F0022B724 /* MomenticTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MomenticTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5AD8B92F2E856EBE00779C1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF4854A2EF8205F0022B724 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -49,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				5AD8B9342E856EBE00779C1C /* Momentic */,
+				5AF4854E2EF8205F0022B724 /* MomenticTests */,
 				5AD8B9332E856EBE00779C1C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				5AD8B9322E856EBE00779C1C /* Momentic.app */,
+				5AF4854D2EF8205F0022B724 /* MomenticTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,6 +111,29 @@
 			productReference = 5AD8B9322E856EBE00779C1C /* Momentic.app */;
 			productType = "com.apple.product-type.application";
 		};
+		5AF4854C2EF8205F0022B724 /* MomenticTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AF485552EF8205F0022B724 /* Build configuration list for PBXNativeTarget "MomenticTests" */;
+			buildPhases = (
+				5AF485492EF8205F0022B724 /* Sources */,
+				5AF4854A2EF8205F0022B724 /* Frameworks */,
+				5AF4854B2EF8205F0022B724 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AF485522EF8205F0022B724 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5AF4854E2EF8205F0022B724 /* MomenticTests */,
+			);
+			name = MomenticTests;
+			packageProductDependencies = (
+			);
+			productName = MomenticTests;
+			productReference = 5AF4854D2EF8205F0022B724 /* MomenticTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -98,6 +146,10 @@
 				TargetAttributes = {
 					5AD8B9312E856EBE00779C1C = {
 						CreatedOnToolsVersion = 26.0;
+					};
+					5AF4854C2EF8205F0022B724 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 5AD8B9312E856EBE00779C1C;
 					};
 				};
 			};
@@ -117,12 +169,20 @@
 			projectRoot = "";
 			targets = (
 				5AD8B9312E856EBE00779C1C /* Momentic */,
+				5AF4854C2EF8205F0022B724 /* MomenticTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		5AD8B9302E856EBE00779C1C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF4854B2EF8205F0022B724 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -139,7 +199,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF485492EF8205F0022B724 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5AF485522EF8205F0022B724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AD8B9312E856EBE00779C1C /* Momentic */;
+			targetProxy = 5AF485512EF8205F0022B724 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5AD8B9462E856EC100779C1C /* Debug */ = {
@@ -329,6 +404,48 @@
 			};
 			name = Release;
 		};
+		5AF485532EF8205F0022B724 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 79PT37LBMS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.momentic.MomenticTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Momentic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Momentic";
+			};
+			name = Debug;
+		};
+		5AF485542EF8205F0022B724 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 79PT37LBMS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.momentic.MomenticTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Momentic.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Momentic";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -346,6 +463,15 @@
 			buildConfigurations = (
 				5AD8B9462E856EC100779C1C /* Debug */,
 				5AD8B9472E856EC100779C1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AF485552EF8205F0022B724 /* Build configuration list for PBXNativeTarget "MomenticTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AF485532EF8205F0022B724 /* Debug */,
+				5AF485542EF8205F0022B724 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

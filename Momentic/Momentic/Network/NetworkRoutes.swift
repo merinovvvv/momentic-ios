@@ -17,6 +17,7 @@ enum NetworkRoutes {
     case resendVerify
     case updateProfile
     case updateAvatar
+    case logs
     
     var url: URL? {
         var path: String
@@ -33,6 +34,8 @@ enum NetworkRoutes {
             path = NetworkRoutes.baseURL + "user/profile/"
         case .updateAvatar:
             path = NetworkRoutes.baseURL + "user/avatar/"
+        case .logs:
+            path = NetworkRoutes.baseURL + "logs/"
         }
         
         return URL(string: path)
@@ -41,7 +44,7 @@ enum NetworkRoutes {
     var httpMethod: HTTPMethod {
         switch self {
             
-        case .register, .login, .verify, .resendVerify: .post
+        case .register, .login, .verify, .resendVerify, .logs: .post
         case .updateProfile, .updateAvatar: .patch
             
         }

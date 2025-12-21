@@ -16,8 +16,8 @@ final class LoginViewModel: AuthViewModelProtocol {
     var email: String?
     var password: String?
     
-    private let networkHandler: NetworkHandler
-    private let tokenStorage: AccessTokenStorage
+    private let networkHandler: NetworkHandlerProtocol
+    private let tokenStorage: AccessTokenStorageProtocol
     
     //MARK: - Closures
     
@@ -27,7 +27,7 @@ final class LoginViewModel: AuthViewModelProtocol {
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+    init(networkHandler: NetworkHandlerProtocol, tokenStorage: AccessTokenStorageProtocol) {
         self.networkHandler = networkHandler
         self.tokenStorage = tokenStorage
         authText = NSLocalizedString("signin_button_text", comment: "SignIn")
@@ -48,6 +48,11 @@ final class LoginViewModel: AuthViewModelProtocol {
         }
         
         if !validationErrors.isEmpty {
+            LoggingService.shared.warning(
+                "Login validation failed",
+                category: "Auth",
+                metadata: ["errors": validationErrors.map { $0.localizedDescription ?? "" }.joined(separator: ", ")]
+            )
             onValidationErrors?(validationErrors)
             return
         }
@@ -56,24 +61,38 @@ final class LoginViewModel: AuthViewModelProtocol {
         let method = route.httpMethod
         
         guard let url = route.url else {
-            print("No url found")
+            LoggingService.shared.error(
+                "Login URL not found",
+                category: "Auth",
+                metadata: ["route": "login"]
+            )
             onFailure?(ConfigurationError.nilObject)
             return
         }
         
         let jsonDictionary = UserCredentials(email: email ?? "", password: password ?? "")
         
+        LoggingService.shared.info("Login attempt started", category: "Auth")
+        
         networkHandler.request(
             url,
             responseType: AccessToken.self,
             jsonDictionary: jsonDictionary,
-            httpMethod: method.rawValue) { [weak self] result in
+            httpMethod: method.rawValue,
+            contentType: ContentType.json.rawValue,
+            accessToken: nil) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let token):
+                        LoggingService.shared.info("Login successful", category: "Auth")
                         self?.tokenStorage.save(token)
                         self?.onSuccess?()
                     case .failure(let error):
+                        LoggingService.shared.logError(
+                            error,
+                            category: "Auth",
+                            additionalMetadata: ["action": "login"]
+                        )
                         //self?.onFailure?(error)
                         self?.onSuccess?()
                     }

@@ -8,7 +8,14 @@
 import Foundation
 import Security
 
-struct AccessTokenStorage {
+// Protocol to make AccessTokenStorage mockable
+protocol AccessTokenStorageProtocol {
+    func save(_ token: AccessToken) -> Bool
+    func get() -> AccessToken?
+    func delete() -> Bool
+}
+
+struct AccessTokenStorage: AccessTokenStorageProtocol {
     
     private let accountKey = "com.momentic.auth_class_token"
     

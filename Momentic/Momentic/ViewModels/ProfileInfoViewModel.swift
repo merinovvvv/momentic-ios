@@ -11,12 +11,12 @@ final class ProfileInfoViewModel {
     
     //MARK: - Private properties
     
-    private let networkHandler: NetworkHandler
-    private let tokenStorage: AccessTokenStorage
+    private let networkHandler: NetworkHandlerProtocol
+    private let tokenStorage: AccessTokenStorageProtocol
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+    init(networkHandler: NetworkHandlerProtocol, tokenStorage: AccessTokenStorageProtocol) {
         self.networkHandler = networkHandler
         self.tokenStorage = tokenStorage
     }
@@ -52,6 +52,11 @@ final class ProfileInfoViewModel {
         }
         
         if !validationErrors.isEmpty {
+            LoggingService.shared.warning(
+                "Profile info validation failed",
+                category: "Profile",
+                metadata: ["errors": validationErrors.map { $0.localizedDescription ?? "" }.joined(separator: ", ")]
+            )
             onValidationErrors?(validationErrors)
             return
         }
@@ -60,22 +65,37 @@ final class ProfileInfoViewModel {
         let method = route.httpMethod
         
         guard let url = route.url else {
+            LoggingService.shared.error(
+                "Update profile URL not found",
+                category: "Profile",
+                metadata: ["route": "updateProfile"]
+            )
             onFailure?(ConfigurationError.nilObject)
             return
         }
         
         let jsonDictionary = UserInfo(name: name ?? "", surname: surname ?? "", bio: bio, token: tokenStorage.get()?.accessToken ?? "")
         
+        LoggingService.shared.info("Profile update started", category: "Profile")
+        
         networkHandler.request(
             url,
             jsonDictionary: jsonDictionary,
             httpMethod: method.rawValue,
+            contentType: ContentType.json.rawValue,
+            accessToken: tokenStorage.get()?.accessToken
         ) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(_):
+                    LoggingService.shared.info("Profile update successful", category: "Profile")
                     self?.onSuccess?()
                 case .failure(let error):
+                    LoggingService.shared.logError(
+                        error,
+                        category: "Profile",
+                        additionalMetadata: ["action": "update_profile"]
+                    )
                     //self?.onFailure?(error)
                     self?.onSuccess?()
                 }
@@ -84,14 +104,14 @@ final class ProfileInfoViewModel {
     }
     
     //MARK: - Private Methods
-    private func isValidName() -> Bool {
+    func isValidName() -> Bool {
         guard let name, !name.isEmpty else {
             return false
         }
         return true
     }
     
-    private func isValidSurname() -> Bool {
+    func isValidSurname() -> Bool {
         guard let surname, !surname.isEmpty else {
             return false
         }

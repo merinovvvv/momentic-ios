@@ -13,12 +13,12 @@ final class VerificationCodeViewModel {
     
     private let email: String
     private let password: String
-    private let networkHandler: NetworkHandler
-    private let tokenStorage: AccessTokenStorage
+    private let networkHandler: NetworkHandlerProtocol
+    private let tokenStorage: AccessTokenStorageProtocol
     
     //MARK: - Init
     
-    init(email: String, password: String, networkHandler: NetworkHandler, tokenStorage: AccessTokenStorage) {
+    init(email: String, password: String, networkHandler: NetworkHandlerProtocol, tokenStorage: AccessTokenStorageProtocol) {
         self.email = email
         self.password = password
         self.networkHandler = networkHandler
@@ -41,30 +41,50 @@ final class VerificationCodeViewModel {
         let method = route.httpMethod
         
         guard let url = route.url else {
+            LoggingService.shared.error(
+                "Verification URL not found",
+                category: "Auth",
+                metadata: ["route": "verify"]
+            )
             onError?(ConfigurationError.nilObject.localizedDescription)
             return
         }
         
         let jsonDictionary = VerifyCodeRequest(email: email, password: password, code: code)
         
+        LoggingService.shared.info("Verification code attempt started", category: "Auth")
+        
         networkHandler.request(
             url,
             responseType: VerificationResponse.self,
             jsonDictionary: jsonDictionary,
-            httpMethod: method.rawValue
+            httpMethod: method.rawValue,
+            contentType: ContentType.json.rawValue,
+            accessToken: nil
         ) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let response):
                     if response.success {
+                        LoggingService.shared.info("Verification code successful", category: "Auth")
                         if let token = response.token {
                             self?.tokenStorage.save(token)
                         }
                         self?.onVerificationSuccess?()
                     } else {
+                        LoggingService.shared.warning(
+                            "Invalid verification code",
+                            category: "Auth",
+                            metadata: ["message": response.message]
+                        )
                         self?.onInvalidCode?(response.message)
                     }
                 case .failure(let error):
+                    LoggingService.shared.logError(
+                        error,
+                        category: "Auth",
+                        additionalMetadata: ["action": "verify_code"]
+                    )
                     //self?.onError?(error.localizedDescription)
                     self?.onVerificationSuccess?()
                 }
@@ -77,27 +97,47 @@ final class VerificationCodeViewModel {
         let method = route.httpMethod
         
         guard let url = route.url else {
+            LoggingService.shared.error(
+                "Resend verification URL not found",
+                category: "Auth",
+                metadata: ["route": "resendVerify"]
+            )
             onError?(ConfigurationError.nilObject.localizedDescription)
             return
         }
         
         let body = ["email": email]
         
+        LoggingService.shared.info("Resend verification code requested", category: "Auth")
+        
         networkHandler.request(
             url,
             responseType: VerificationResponse.self,
             jsonDictionary: body,
-            httpMethod: method.rawValue
+            httpMethod: method.rawValue,
+            contentType: ContentType.json.rawValue,
+            accessToken: nil
         ) { [weak self] result in
             
             switch result {
             case .success(let response):
                 if response.success {
+                    LoggingService.shared.info("Resend verification code successful", category: "Auth")
                     self?.onResendVerificationSuccess?()
                 } else {
+                    LoggingService.shared.warning(
+                        "Resend verification code failed",
+                        category: "Auth",
+                        metadata: ["message": response.message]
+                    )
                     self?.onResendVerificationFailure?(response.message)
                 }
             case .failure(let error):
+                LoggingService.shared.logError(
+                    error,
+                    category: "Auth",
+                    additionalMetadata: ["action": "resend_verification_code"]
+                )
                 self?.onError?(error.localizedDescription)
             }
         }

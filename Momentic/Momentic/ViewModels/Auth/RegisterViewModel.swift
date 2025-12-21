@@ -16,7 +16,7 @@ final class RegisterViewModel: AuthViewModelProtocol {
     
     var authText: String
     
-    private let networkHandler: NetworkHandler
+    private let networkHandler: NetworkHandlerProtocol
     
     //MARK: - Closures
     
@@ -26,7 +26,7 @@ final class RegisterViewModel: AuthViewModelProtocol {
     
     //MARK: - Init
     
-    init(networkHandler: NetworkHandler) {
+    init(networkHandler: NetworkHandlerProtocol) {
         self.networkHandler = networkHandler
         authText = NSLocalizedString("signup_button_text", comment: "SignUp")
     }
@@ -46,6 +46,11 @@ final class RegisterViewModel: AuthViewModelProtocol {
         }
         
         if !validationErrors.isEmpty {
+            LoggingService.shared.warning(
+                "Registration validation failed",
+                category: "Auth",
+                metadata: ["errors": validationErrors.map { $0.localizedDescription ?? "" }.joined(separator: ", ")]
+            )
             onValidationErrors?(validationErrors)
             return
         }
@@ -54,21 +59,36 @@ final class RegisterViewModel: AuthViewModelProtocol {
         let method = route.httpMethod
         
         guard let url = route.url else {
+            LoggingService.shared.error(
+                "Registration URL not found",
+                category: "Auth",
+                metadata: ["route": "register"]
+            )
             onFailure?(ConfigurationError.nilObject)
             return
         }
         
         let jsonDictionary = UserCredentials(email: email ?? "", password: password ?? "")
         
+        LoggingService.shared.info("Registration attempt started", category: "Auth")
+        
         networkHandler.request(
             url,
             jsonDictionary: jsonDictionary,
-            httpMethod: method.rawValue) { [weak self] result in
+            httpMethod: method.rawValue,
+            contentType: ContentType.json.rawValue,
+            accessToken: nil) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(_):
+                        LoggingService.shared.info("Registration successful", category: "Auth")
                         self?.onSuccess?()
                     case .failure(let error):
+                        LoggingService.shared.logError(
+                            error,
+                            category: "Auth",
+                            additionalMetadata: ["action": "register"]
+                        )
                         //self?.onFailure?(error)
                         self?.onSuccess?()
                     }

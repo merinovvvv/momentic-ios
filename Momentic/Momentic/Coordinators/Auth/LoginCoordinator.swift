@@ -24,7 +24,7 @@ final class LoginCoordinator: Coordinator {
     
     private func showSignInModule() {
         
-        let loginViewModel = LoginViewModel(networkHandler: .init(), tokenStorage: .init())
+        let loginViewModel = LoginViewModel(networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
         
         let loginViewController = moduleFactory.createLoginModule(with: loginViewModel)
         
@@ -36,7 +36,7 @@ final class LoginCoordinator: Coordinator {
             self?.showEnterCodeModule(email: email, password: password)
         }
         
-        loginViewController.completionHandler = { credentials in
+        loginViewController.completionHandler = { (credentials: UserCredentials) in
             
             loginViewController.viewModel.email = credentials.email
             loginViewController.viewModel.password = credentials.password
@@ -48,11 +48,11 @@ final class LoginCoordinator: Coordinator {
     }
     
     private func showEnterCodeModule(email: String, password: String) {
-        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: .init(), tokenStorage: .init())
+        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
         
         let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
         
-        verificationCodeViewController.completionHandler = { [weak self] _ in
+        verificationCodeViewController.completionHandler = { [weak self] (_: Void) in
             //TODO: - finish login
             self?.flowCompletionHandler?()
         }

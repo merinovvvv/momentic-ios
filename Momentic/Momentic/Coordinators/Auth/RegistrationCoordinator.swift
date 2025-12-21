@@ -25,7 +25,7 @@ final class RegistrationCoordinator: Coordinator {
     
     private func showSignUpModule() {
         
-        let registerViewModel = RegisterViewModel(networkHandler: .init())
+        let registerViewModel = RegisterViewModel(networkHandler: NetworkHandler())
         
         let registerViewController = moduleFactory.createRegisterModule(with: registerViewModel)
         
@@ -49,7 +49,7 @@ final class RegistrationCoordinator: Coordinator {
     
     private func showEnterCodeModule(email: String, password: String) {
         
-        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: .init(), tokenStorage: .init())
+        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
         
         let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
         
@@ -62,7 +62,7 @@ final class RegistrationCoordinator: Coordinator {
     
     private func showProfileInfoModule() {
         
-        let profileInfoViewModel = ProfileInfoViewModel(networkHandler: .init(), tokenStorage: .init())
+        let profileInfoViewModel = ProfileInfoViewModel(networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
         
         let profileInfoViewController = moduleFactory.createProfileInfoModule(with: profileInfoViewModel)
         
@@ -74,7 +74,7 @@ final class RegistrationCoordinator: Coordinator {
     }
     
     private func showAddPhotoModule() {
-        let addPhotoViewModel = AddPhotoViewModel(networkHandler: .init(), tokenStorage: .init())
+        let addPhotoViewModel = AddPhotoViewModel(networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
         let addPhotoViewController = moduleFactory.createAddPhotoModule(with: addPhotoViewModel)
         
         addPhotoViewController.completionHandler = { [weak self] shouldAddPhoto in
