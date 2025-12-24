@@ -16,6 +16,7 @@ final class MainViewController: UIViewController {
     private var playerLayer: AVPlayerLayer?
     private var currentVideoIndex = 0
     private var activeTab: TabType = .friends
+    private let commentsStore = CommentsStore()
     
     //MARK: - Constants
     
@@ -421,6 +422,15 @@ private extension MainViewController {
         friendsTabButton.addTarget(self, action: #selector(friendsTabTapped), for: .touchUpInside)
         globalTabButton.addTarget(self, action: #selector(globalTabTapped), for: .touchUpInside)
         searchButton.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
+        commentButton.addTarget(self, action: #selector(openCommentsTapped), for: .touchUpInside)
+
+        likeReactionButton.addTarget(self, action: #selector(likeReactionTapped), for: .touchUpInside)
+        fireReactionButton.addTarget(self, action: #selector(fireReactionTapped), for: .touchUpInside)
+        laughReactionButton.addTarget(self, action: #selector(laughReactionTapped), for: .touchUpInside)
+        angryReactionButton.addTarget(self, action: #selector(angryReactionTapped), for: .touchUpInside)
+        
+        let cachedCount = commentsStore.load().count
+        commentButton.setCount("\(cachedCount)")
         
         updateTabSelection()
     }
@@ -526,6 +536,37 @@ private extension MainViewController {
     @objc func searchTapped() {
         // Handle search action
     }
+    
+    @objc func openCommentsTapped() {
+        let videoID = "5" // Replace with actual dynamic video ID if available
+        let userAvatarURL = URL(string: "https://example.com/my-avatar.png") // Replace with actual user's avatar URL
+        let commentsViewModel = CommentsViewModel(videoID: videoID, userAvatarURL: userAvatarURL)
+        let commentsViewController = CommentsViewController(viewModel: commentsViewModel)
+        commentsViewController.delegate = self
+        commentsViewController.modalPresentationStyle = .overFullScreen
+        commentsViewController.modalTransitionStyle = .crossDissolve
+        present(commentsViewController, animated: true)
+    }
+
+    // MARK: - Reaction Taps
+    @objc func likeReactionTapped() {
+        updateReactionCount(for: likeReactionButton)
+    }
+    @objc func fireReactionTapped() {
+        updateReactionCount(for: fireReactionButton)
+    }
+    @objc func laughReactionTapped() {
+        updateReactionCount(for: laughReactionButton)
+    }
+    @objc func angryReactionTapped() {
+        updateReactionCount(for: angryReactionButton)
+    }
+    private func updateReactionCount(for button: ReactionButton) {
+        // Simple increment/decrement logic (for demonstration)
+        let currentCount = Int(button.countLabel.text ?? "0") ?? 0
+        button.countLabel.text = "\(currentCount + 1)"
+    }
+
 }
 
 //MARK: - CustomTabBarDelegate
@@ -533,6 +574,14 @@ private extension MainViewController {
 extension MainViewController: CustomTabBarDelegate {
     func tabBar(_ tabBar: CustomTabBar, didSelectTab tab: TabBarItem) {
         // Handle tab selection
+    }
+}
+
+//MARK: - CommentsViewControllerDelegate
+
+extension MainViewController: CommentsViewControllerDelegate {
+    func commentsViewController(_ controller: CommentsViewController, didUpdateCount count: Int) {
+        commentButton.setCount("\(count)")
     }
 }
 
@@ -559,7 +608,7 @@ class ReactionButton: UIButton {
         return label
     }()
     
-    private let countLabel: UILabel = {
+    let countLabel: UILabel = {
         let label = UILabel()
         label.font = .readexPro(size: Constants.reactionCountFontSize, weight: .medium)
         label.textColor = .white
@@ -646,6 +695,10 @@ class CommentReactionButton: UIButton {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setCount(_ text: String) {
+        countLabel.text = text
     }
 }
 

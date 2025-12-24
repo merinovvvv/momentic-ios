@@ -9,7 +9,7 @@ import Foundation
 
 enum NetworkRoutes {
     
-    private static let baseURL: String = "http://127.0.0.1:8080/api/"
+    private static let baseURL: String = "https://comate-penney-biannulate.ngrok-free.dev/"
     
     case register
     case login
@@ -18,6 +18,8 @@ enum NetworkRoutes {
     case updateProfile
     case updateAvatar
     case logs
+    case fetchComments(videoID: String)
+    case postComment(videoID: String)
     
     var url: URL? {
         var path: String
@@ -36,6 +38,10 @@ enum NetworkRoutes {
             path = NetworkRoutes.baseURL + "user/avatar/"
         case .logs:
             path = NetworkRoutes.baseURL + "logs/"
+        case .fetchComments(let videoID):
+            path = NetworkRoutes.baseURL + "videos/\(videoID)/comments/"
+        case .postComment(let videoID):
+            path = NetworkRoutes.baseURL + "videos/\(videoID)/comments/"
         }
         
         return URL(string: path)
@@ -43,10 +49,14 @@ enum NetworkRoutes {
     
     var httpMethod: HTTPMethod {
         switch self {
-            
-        case .register, .login, .verify, .resendVerify, .logs: .post
-        case .updateProfile, .updateAvatar: .patch
-            
+        case .register, .login, .verify, .resendVerify, .logs:
+            return .post
+        case .updateProfile, .updateAvatar:
+            return .patch
+        case .fetchComments:
+            return .get
+        case .postComment:
+            return .post
         }
     }
 }
