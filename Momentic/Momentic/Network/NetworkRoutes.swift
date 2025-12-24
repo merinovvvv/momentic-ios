@@ -9,7 +9,7 @@ import Foundation
 
 enum NetworkRoutes {
     
-    private static let baseURL: String = "https://comate-penney-biannulate.ngrok-free.dev/"
+    private static let baseURL: String = "https://momentic.lol/"
     
     case register
     case login

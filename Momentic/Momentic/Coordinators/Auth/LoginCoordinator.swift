@@ -33,7 +33,8 @@ final class LoginCoordinator: Coordinator {
             let password = loginViewController.viewModel.password else {
                 return
             }
-            self?.showEnterCodeModule(email: email, password: password)
+            self?.flowCompletionHandler?()
+            //self?.showEnterCodeModule(email: email, password: password)
         }
         
         loginViewController.completionHandler = { (credentials: UserCredentials) in
@@ -47,16 +48,16 @@ final class LoginCoordinator: Coordinator {
         navigationController.pushViewController(loginViewController, animated: true)
     }
     
-    private func showEnterCodeModule(email: String, password: String) {
-        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
-        
-        let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
-        
-        verificationCodeViewController.completionHandler = { [weak self] (_: Void) in
-            //TODO: - finish login
-            self?.flowCompletionHandler?()
-        }
-        
-        navigationController.pushViewController(verificationCodeViewController, animated: true)
-    }
+//    private func showEnterCodeModule(email: String, password: String) {
+//        let verificationCodeViewModel = VerificationCodeViewModel(email: email, password: password, networkHandler: NetworkHandler(), tokenStorage: AccessTokenStorage())
+//        
+//        let verificationCodeViewController = moduleFactory.createEnterCodeModule(with: verificationCodeViewModel)
+//        
+//        verificationCodeViewController.completionHandler = { [weak self] (_: Void) in
+//            //TODO: - finish login
+//            self?.flowCompletionHandler?()
+//        }
+//        
+//        navigationController.pushViewController(verificationCodeViewController, animated: true)
+//    }
 }

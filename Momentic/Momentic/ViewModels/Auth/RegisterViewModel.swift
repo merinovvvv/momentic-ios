@@ -89,8 +89,8 @@ final class RegisterViewModel: AuthViewModelProtocol {
                             category: "Auth",
                             additionalMetadata: ["action": "register"]
                         )
-                        //self?.onFailure?(error)
-                        self?.onSuccess?()
+                        self?.onFailure?(error)
+                        //self?.onSuccess?()
                     }
                 }
             }

@@ -49,8 +49,8 @@ final class ChatWebSocketService: NSObject, ChatWebSocketServicing {
     var onMessage: ((ChatMessage) -> Void)?
     var onStateChange: ((ConnectionState) -> Void)?
     
-    init(url: URL? = URL(string: "wss://comate-penney-biannulate.ngrok-free.dev/ws/chat")) {
-        self.url = url ?? URL(string: "wss://comate-penney-biannulate.ngrok-free.dev/ws/chat")!
+    init(url: URL? = URL(string: "wss://https://momentic.lol/ws/chat")) {
+        self.url = url ?? URL(string: "wss:https://momentic.lol/ws/chat")!
         super.init()
     }
     

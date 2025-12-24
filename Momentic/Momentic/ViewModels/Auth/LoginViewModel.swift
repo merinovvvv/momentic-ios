@@ -93,8 +93,8 @@ final class LoginViewModel: AuthViewModelProtocol {
                             category: "Auth",
                             additionalMetadata: ["action": "login"]
                         )
-                        //self?.onFailure?(error)
-                        self?.onSuccess?()
+                        self?.onFailure?(error)
+                        //self?.onSuccess?()
                     }
                     
                 }
